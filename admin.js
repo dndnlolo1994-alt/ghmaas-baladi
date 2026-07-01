@@ -336,6 +336,36 @@ addCategoryButton.addEventListener("click", () => {
   renderMenu();
 });
 
+// Tab Switcher Logic
+const tabs = document.querySelectorAll(".nav-tab");
+const tabPanes = document.querySelectorAll(".tab-pane");
+const currentSectionLabel = document.getElementById("currentSectionLabel");
+const currentSectionTitle = document.getElementById("currentSectionTitle");
+
+const sectionTitles = {
+  "tab-site": ["بيانات الموقع", "تعديل الإعدادات العامة للمطعم"],
+  "tab-branches": ["الفروع", "إدارة فروع غماس بلدي وعناوينها"],
+  "tab-menu": ["المنيو والأسعار", "إدارة أقسام ووجبات قائمة الطعام"],
+};
+
+tabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    tabs.forEach((t) => t.classList.remove("active"));
+    tabPanes.forEach((p) => p.classList.remove("active"));
+
+    tab.classList.add("active");
+    const target = tab.dataset.target;
+    const pane = document.getElementById(target);
+    if (pane) pane.classList.add("active");
+
+    // Update headers
+    if (sectionTitles[target]) {
+      currentSectionLabel.textContent = sectionTitles[target][0];
+      currentSectionTitle.textContent = sectionTitles[target][1];
+    }
+  });
+});
+
 api("/api/me")
   .then((me) => {
     if (me.authenticated) return loadAdmin();

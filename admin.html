@@ -38,69 +38,101 @@
       </section>
 
       <section class="admin-app" id="adminApp" hidden>
-        <header class="admin-topbar">
-          <div>
-            <span>لوحة التحكم</span>
-            <h1>غماس بلدي</h1>
-          </div>
-          <div class="admin-actions">
-            <a class="admin-secondary" href="/" target="_blank" rel="noreferrer">
-              <i data-lucide="external-link"></i>
-              عرض الموقع
-            </a>
-            <button class="admin-secondary" type="button" id="logoutButton">
-              <i data-lucide="log-out"></i>
-              خروج
-            </button>
-            <button class="admin-primary" type="button" id="saveButton">
-              <i data-lucide="save"></i>
-              حفظ كل التعديلات
-            </button>
-          </div>
-        </header>
-
-        <p class="admin-status" id="adminStatus">جاهز للتعديل.</p>
-
-        <section class="admin-panel">
-          <div class="admin-panel-heading">
-            <i data-lucide="settings"></i>
-            <div>
-              <h2>بيانات الموقع</h2>
-              <p>الاسم، التواصل، الإهداء، وصور الهيرو.</p>
+        <div class="admin-layout">
+          <!-- Sidebar on the Right (RTL) -->
+          <aside class="admin-sidebar">
+            <div class="sidebar-brand">
+              <img src="./logo.png" alt="غماس بلدي" />
+              <div>
+                <h2>غماس بلدي</h2>
+                <span>لوحة التحكم المتقدمة</span>
+              </div>
             </div>
-          </div>
-          <div class="admin-grid two" id="siteFields"></div>
-        </section>
-
-        <section class="admin-panel">
-          <div class="admin-panel-heading">
-            <i data-lucide="map-pin"></i>
-            <div>
-              <h2>الفروع</h2>
-              <p>أضف أو عدل عناوين الفروع وروابط الخرائط.</p>
+            <nav class="sidebar-nav">
+              <button class="nav-tab active" data-target="tab-site" type="button">
+                <i data-lucide="settings"></i>
+                <span>بيانات الموقع</span>
+              </button>
+              <button class="nav-tab" data-target="tab-branches" type="button">
+                <i data-lucide="map-pin"></i>
+                <span>الفروع</span>
+              </button>
+              <button class="nav-tab" data-target="tab-menu" type="button">
+                <i data-lucide="utensils"></i>
+                <span>المنيو والأسعار</span>
+              </button>
+            </nav>
+            <div class="sidebar-footer">
+              <a class="sidebar-link" href="/" target="_blank">
+                <i data-lucide="external-link"></i>
+                <span>عرض الموقع</span>
+              </a>
+              <button class="logout-btn" type="button" id="logoutButton">
+                <i data-lucide="log-out"></i>
+                <span>تسجيل الخروج</span>
+              </button>
             </div>
-          </div>
-          <div class="admin-list" id="branchesEditor"></div>
-          <button class="admin-secondary inline" type="button" id="addBranchButton">
-            <i data-lucide="plus"></i>
-            إضافة فرع
-          </button>
-        </section>
+          </aside>
 
-        <section class="admin-panel">
-          <div class="admin-panel-heading">
-            <i data-lucide="utensils"></i>
-            <div>
-              <h2>المنيو والأسعار</h2>
-              <p>كل صنف قابل للتعديل: الاسم، الوصف، السعر، والصورة.</p>
+          <!-- Main Content Area on the Left -->
+          <main class="admin-content">
+            <header class="content-header">
+              <div>
+                <span class="eyebrow" id="currentSectionLabel">بيانات الموقع</span>
+                <h1 id="currentSectionTitle">تعديل الإعدادات العامة للمطعم</h1>
+              </div>
+              <button class="save-all-btn" type="button" id="saveButton">
+                <i data-lucide="save"></i>
+                حفظ التغييرات
+              </button>
+            </header>
+
+            <p class="admin-status" id="adminStatus">جاهز للتعديل.</p>
+
+            <!-- Tab: Site Settings -->
+            <div class="tab-pane active" id="tab-site">
+              <div class="panel-card">
+                <div class="panel-card-header">
+                  <i data-lucide="settings"></i>
+                  <h3>الإعدادات العامة للعلامة التجارية والتواصل</h3>
+                </div>
+                <div class="admin-grid two" id="siteFields"></div>
+              </div>
             </div>
-          </div>
-          <div class="admin-list" id="menuEditor"></div>
-          <button class="admin-secondary inline" type="button" id="addCategoryButton">
-            <i data-lucide="plus"></i>
-            إضافة قسم
-          </button>
-        </section>
+
+            <!-- Tab: Branches -->
+            <div class="tab-pane" id="tab-branches">
+              <div class="panel-card">
+                <div class="panel-card-header">
+                  <div class="header-with-action">
+                    <h3>فروع المطعم وعناوينها</h3>
+                    <button class="add-item-btn" type="button" id="addBranchButton">
+                      <i data-lucide="plus"></i>
+                      إضافة فرع جديد
+                    </button>
+                  </div>
+                </div>
+                <div class="admin-list" id="branchesEditor"></div>
+              </div>
+            </div>
+
+            <!-- Tab: Menu -->
+            <div class="tab-pane" id="tab-menu">
+              <div class="panel-card">
+                <div class="panel-card-header">
+                  <div class="header-with-action">
+                    <h3>قائمة الوجبات والأصناف والأسعار</h3>
+                    <button class="add-item-btn" type="button" id="addCategoryButton">
+                      <i data-lucide="plus"></i>
+                      إضافة قسم جديد
+                    </button>
+                  </div>
+                </div>
+                <div class="admin-list" id="menuEditor"></div>
+              </div>
+            </div>
+          </main>
+        </div>
       </section>
     </main>
   </body>
