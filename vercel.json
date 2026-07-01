@@ -8,6 +8,7 @@
         "includeFiles": [
           "index.html",
           "admin.html",
+          "admin.js",
           "styles.css",
           "script.js",
           "menu-data.js",
