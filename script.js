@@ -629,15 +629,26 @@ function renderBranches() {
       }
     }
 
+    let imageSrc = "./branch_madina.png";
+    if (index === 1) imageSrc = "./branch_mecca.png";
+    if (index === 2) imageSrc = "./branch_tabarbour.png";
+
     article.innerHTML = `
-      <i data-lucide="${index === 0 ? "map-pin" : index === 1 ? "building-2" : "navigation"}"></i>
-      <strong>${branchTitle}</strong>
-      <span>${branchAddress}</span>
-      ${
-        branch.mapUrl
-          ? `<a href="${branch.mapUrl}" target="_blank" rel="noreferrer">${currentLang === "ar" ? "الموقع على الخريطة" : "Location on Map"}</a>`
-          : ""
-      }
+      <div class="branch-image-container">
+        <img src="${imageSrc}" alt="${branchTitle}" loading="lazy" />
+      </div>
+      <div class="branch-info-container">
+        <div class="branch-header-row">
+          <i data-lucide="${index === 0 ? "map-pin" : index === 1 ? "building-2" : "navigation"}"></i>
+          <strong>${branchTitle}</strong>
+        </div>
+        <span>${branchAddress}</span>
+        ${
+          branch.mapUrl
+            ? `<a href="${branch.mapUrl}" target="_blank" rel="noreferrer">${currentLang === "ar" ? "الموقع على الخريطة" : "Location on Map"}</a>`
+            : ""
+        }
+      </div>
     `;
     branchGrid.appendChild(article);
   });
