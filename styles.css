@@ -1947,6 +1947,7 @@ input {
   gap: 6px;
   color: var(--cream-soft);
   font-weight: 800;
+  min-width: 0;
 }
 
 .admin-field input,
@@ -3681,7 +3682,7 @@ html[dir="rtl"] .admin-layout {
 
 @media (max-width: 1100px) {
   .admin-layout {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 
   .admin-sidebar,
@@ -3723,7 +3724,7 @@ html[dir="rtl"] .admin-layout {
 
   .admin-summary-strip,
   .admin-grid.two {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 
   .panel-card {
@@ -3731,11 +3732,11 @@ html[dir="rtl"] .admin-layout {
   }
 
   .sidebar-footer {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 
   .admin-item-row {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 }
 
