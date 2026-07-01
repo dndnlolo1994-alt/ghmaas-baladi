@@ -62,18 +62,21 @@ function defaultSite() {
         title: "شارع المدينة المنورة",
         address: "عمان - الأردن",
         mapUrl: "https://maps.app.goo.gl/UJLZoKhrjdQJPzec7?g_st=ic",
+        image: "./branch_madina.png",
         featured: true,
       },
       {
         title: "شارع مكة",
         address: "مجمع الداوود - عمان",
         mapUrl: "",
+        image: "./branch_mecca.png",
         featured: false,
       },
       {
         title: "طبربور",
         address: "دوار الدبابة - عمان",
         mapUrl: "",
+        image: "./branch_tabarbour.png",
         featured: false,
       },
     ],
@@ -208,6 +211,34 @@ async function handleApi(req, res, pathname) {
     }
     const body = await readBody(req);
     sendJson(res, 200, writeSite(body));
+    return true;
+  }
+
+  if (req.method === "POST" && pathname === "/api/upload") {
+    if (!isAuthed(req)) {
+      sendJson(res, 401, { error: "يلزم تسجيل الدخول للأدمن" });
+      return true;
+    }
+    const url = new URL(req.url, `http://${req.headers.host}`);
+    const filename = url.searchParams.get("filename") || "upload.png";
+    const safeFilename = path.basename(filename).replace(/[^a-zA-Z0-9.-]/g, "_");
+
+    const uploadsDir = path.join(root, "uploads");
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const targetPath = path.join(uploadsDir, safeFilename);
+    const writeStream = fs.createWriteStream(targetPath);
+    req.pipe(writeStream);
+
+    await new Promise((resolve, reject) => {
+      writeStream.on("finish", resolve);
+      writeStream.on("error", reject);
+      req.on("error", reject);
+    });
+
+    sendJson(res, 200, { url: `/uploads/${safeFilename}` });
     return true;
   }
 

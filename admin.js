@@ -49,11 +49,81 @@ async function api(path, options = {}) {
 function makeField(label, value, onInput, type = "input") {
   const wrapper = document.createElement("label");
   wrapper.className = "admin-field";
-  const control =
-    type === "textarea" ? document.createElement("textarea") : document.createElement("input");
+
+  const headerDiv = document.createElement("div");
+  headerDiv.style.display = "flex";
+  headerDiv.style.justifyContent = "space-between";
+  headerDiv.style.alignItems = "center";
+  headerDiv.style.marginBottom = "4px";
+
+  const labelSpan = document.createElement("span");
+  labelSpan.textContent = label;
+  headerDiv.appendChild(labelSpan);
+
+  const control = type === "textarea" ? document.createElement("textarea") : document.createElement("input");
   control.value = value || "";
   control.addEventListener("input", () => onInput(control.value));
-  wrapper.append(label, control);
+
+  // If this is an image field (contains "صورة" or "شعار" or "لوجو")
+  if (label.includes("صورة") || label.includes("الشعار") || label.includes("لوجو") || label.includes("heroImages")) {
+    const uploadBtn = document.createElement("button");
+    uploadBtn.type = "button";
+    uploadBtn.className = "admin-secondary inline";
+    uploadBtn.style.padding = "2px 8px";
+    uploadBtn.style.fontSize = "0.75rem";
+    uploadBtn.style.margin = "0";
+    uploadBtn.innerHTML = `<i data-lucide="upload" style="width: 12px; height: 12px; vertical-align: middle; margin-inline-end: 4px;"></i> رفع`;
+
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.style.display = "none";
+
+    uploadBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      fileInput.click();
+    });
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      try {
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = "جاري الرفع...";
+
+        const url = `/api/upload?filename=${encodeURIComponent(file.name)}`;
+        const response = await fetch(url, {
+          method: "POST",
+          body: file, // Send binary directly
+        });
+
+        if (!response.ok) throw new Error("فشل رفع الملف");
+        const data = await response.json();
+
+        control.value = data.url;
+        onInput(data.url);
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = `<i data-lucide="check" style="width: 12px; height: 12px; color: #10b981; vertical-align: middle; margin-inline-end: 4px;"></i> تم`;
+        setTimeout(() => {
+          uploadBtn.innerHTML = `<i data-lucide="upload" style="width: 12px; height: 12px; vertical-align: middle; margin-inline-end: 4px;"></i> رفع`;
+          if (window.lucide) window.lucide.createIcons();
+        }, 2000);
+      } catch (error) {
+        alert(error.message);
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = `<i data-lucide="upload" style="width: 12px; height: 12px; vertical-align: middle; margin-inline-end: 4px;"></i> رفع`;
+      }
+      if (window.lucide) window.lucide.createIcons();
+    });
+
+    headerDiv.appendChild(uploadBtn);
+    headerDiv.appendChild(fileInput);
+  }
+
+  wrapper.appendChild(headerDiv);
+  wrapper.appendChild(control);
+
   return wrapper;
 }
 
@@ -102,7 +172,7 @@ function renderBranches() {
       }, true),
     );
     const fields = document.createElement("div");
-    fields.className = "admin-grid three";
+    fields.className = "admin-grid two"; // Changed to two columns for 4 fields
     fields.append(
       makeField("اسم الفرع", branch.title, (value) => {
         branch.title = value;
@@ -112,6 +182,9 @@ function renderBranches() {
       }),
       makeField("رابط الخريطة", branch.mapUrl, (value) => {
         branch.mapUrl = value;
+      }),
+      makeField("صورة الفرع (رابط)", branch.image, (value) => {
+        branch.image = value;
       }),
     );
     card.appendChild(fields);

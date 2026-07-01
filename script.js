@@ -632,9 +632,7 @@ function renderBranches() {
       }
     }
 
-    let imageSrc = "./branch_madina.png";
-    if (index === 1) imageSrc = "./branch_mecca.png";
-    if (index === 2) imageSrc = "./branch_tabarbour.png";
+    let imageSrc = branch.image || (index === 0 ? "./branch_madina.png" : index === 1 ? "./branch_mecca.png" : "./branch_tabarbour.png");
 
     article.innerHTML = `
       <div class="branch-image-container">
