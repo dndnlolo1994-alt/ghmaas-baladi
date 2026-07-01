@@ -12,6 +12,7 @@ const saveButton = document.querySelector("#saveButton");
 const logoutButton = document.querySelector("#logoutButton");
 const addBranchButton = document.querySelector("#addBranchButton");
 const addCategoryButton = document.querySelector("#addCategoryButton");
+const adminSummaryStrip = document.querySelector("#adminSummaryStrip");
 
 let site = null;
 
@@ -29,12 +30,44 @@ const textFields = [
   ["mapUrl", "رابط الخريطة"],
   ["taxNote", "ملاحظة الضريبة"],
   ["dedication", "نص الإهداء"],
-  ["sourceNote", "ملاحظة آخر الصفحة", "textarea"],
 ];
 
 function setStatus(message, type = "neutral") {
   statusBox.textContent = message;
   statusBox.dataset.type = type;
+}
+
+function getMenuItemCount() {
+  return (site?.menu || []).reduce((total, category) => total + (category.items || []).length, 0);
+}
+
+function renderSummary() {
+  if (!adminSummaryStrip || !site) return;
+
+  const stats = [
+    { icon: "layout-grid", label: "أقسام المنيو", value: (site.menu || []).length },
+    { icon: "utensils", label: "الأصناف", value: getMenuItemCount() },
+    { icon: "map-pin", label: "الفروع", value: (site.branches || []).length },
+    {
+      icon: "clock-3",
+      label: "آخر تحديث",
+      value: site.updatedAt ? new Date(site.updatedAt).toLocaleDateString("ar-JO") : "غير معروف",
+    },
+  ];
+
+  adminSummaryStrip.innerHTML = stats
+    .map(
+      (stat) => `
+        <article class="admin-summary-card">
+          <i data-lucide="${stat.icon}"></i>
+          <div>
+            <strong>${stat.value}</strong>
+            <span>${stat.label}</span>
+          </div>
+        </article>
+      `,
+    )
+    .join("");
 }
 
 async function api(path, options = {}) {
@@ -47,13 +80,14 @@ async function api(path, options = {}) {
   return data;
 }
 
-function makeField(label, value, onInput, type = "input") {
+function makeField(label, value, onInput, type = "input", fieldKey = "") {
   // Check if this is an image field
   const isImageField = label.includes("صورة") || label.includes("الشعار") || label.includes("لوجو") || label.includes("heroImages");
 
   if (isImageField) {
     const wrapper = document.createElement("div");
     wrapper.className = "admin-field image-field-wrapper";
+    if (fieldKey) wrapper.dataset.field = fieldKey;
 
     const labelSpan = document.createElement("span");
     labelSpan.className = "field-label";
@@ -67,6 +101,7 @@ function makeField(label, value, onInput, type = "input") {
     fileInput.type = "file";
     fileInput.accept = "image/*";
     fileInput.style.display = "none";
+    if (fieldKey) fileInput.dataset.field = fieldKey;
 
     const previewContainer = document.createElement("div");
     previewContainer.className = "uploader-preview";
@@ -145,6 +180,7 @@ function makeField(label, value, onInput, type = "input") {
   // Standard text/textarea fields
   const wrapper = document.createElement("label");
   wrapper.className = "admin-field";
+  if (fieldKey) wrapper.dataset.field = fieldKey;
 
   const headerDiv = document.createElement("div");
   headerDiv.style.display = "flex";
@@ -158,6 +194,7 @@ function makeField(label, value, onInput, type = "input") {
 
   const control = type === "textarea" ? document.createElement("textarea") : document.createElement("input");
   control.value = value || "";
+  if (fieldKey) control.dataset.field = fieldKey;
   control.addEventListener("input", () => onInput(control.value));
 
   wrapper.appendChild(headerDiv);
@@ -181,14 +218,14 @@ function renderSiteFields() {
   textFields.forEach(([key, label, type]) => {
     siteFields.appendChild(makeField(label, site[key], (value) => {
       site[key] = value;
-    }, type));
+    }, type, key));
   });
 
   site.heroImages = site.heroImages || [];
   site.heroImages.forEach((image, index) => {
     siteFields.appendChild(makeField(`صورة الهيرو ${index + 1}`, image, (value) => {
       site.heroImages[index] = value;
-    }));
+    }, "input", `heroImages.${index}`));
   });
 }
 
@@ -230,6 +267,7 @@ function renderBranches() {
     branchesEditor.appendChild(card);
   });
 
+  renderSummary();
   if (window.lucide) window.lucide.createIcons();
 }
 
@@ -307,10 +345,12 @@ function renderMenu() {
     menuEditor.appendChild(section);
   });
 
+  renderSummary();
   if (window.lucide) window.lucide.createIcons();
 }
 
 function renderAll() {
+  renderSummary();
   renderSiteFields();
   renderBranches();
   renderMenu();
@@ -320,6 +360,7 @@ function renderAll() {
 async function loadAdmin() {
   setStatus("جاري تحميل البيانات...");
   site = await api("/api/site");
+  site.sourceNote = "";
   loginCard.hidden = true;
   adminApp.hidden = false;
   renderAll();
@@ -347,6 +388,7 @@ loginForm.addEventListener("submit", async (event) => {
 saveButton.addEventListener("click", async () => {
   try {
     setStatus("جاري الحفظ...");
+    site.sourceNote = "";
     site = await api("/api/site", {
       method: "PUT",
       body: JSON.stringify(site),

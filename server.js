@@ -72,8 +72,7 @@ function defaultSite() {
     mapUrl: "https://maps.app.goo.gl/UJLZoKhrjdQJPzec7?g_st=ic",
     taxNote: "يضاف 8% ضريبة مبيعات على الأسعار.",
     dedication: "إهداء من <a href=\"https://www.dahabweb.com\" target=\"_blank\" rel=\"noreferrer\" class=\"gold-link\" style=\"color: var(--gold); text-decoration: underline; font-weight: 800;\">مؤسسة المسار الذهبي</a> تقديرًا لموقفهم مع النشامى",
-    sourceNote:
-      "بيانات المنيو والصور والأسعار مبنية على صفحة المطعم الأصلية، ويجب مراجعة الأسعار قبل النشر النهائي.",
+    sourceNote: "",
     branches: [
       {
         title: "شارع المدينة المنورة",
@@ -117,6 +116,7 @@ function readSite() {
 function writeSite(site) {
   const next = {
     ...site,
+    sourceNote: "",
     updatedAt: new Date().toISOString(),
   };
   if (!Array.isArray(next.menu)) next.menu = [];
@@ -143,6 +143,7 @@ async function readSiteDb() {
 async function writeSiteDb(site) {
   const next = {
     ...site,
+    sourceNote: "",
     updatedAt: new Date().toISOString(),
   };
   if (!Array.isArray(next.menu)) next.menu = [];

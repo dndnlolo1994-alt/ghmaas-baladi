@@ -33,8 +33,7 @@ let site = {
   mapUrl: "https://maps.app.goo.gl/UJLZoKhrjdQJPzec7?g_st=ic",
   taxNote: "يضاف 8% ضريبة مبيعات على الأسعار.",
   dedication: "إهداء من <a href=\"https://www.dahabweb.com\" target=\"_blank\" rel=\"noreferrer\" class=\"gold-link\" style=\"color: var(--gold); text-decoration: underline; font-weight: 800;\">مؤسسة المسار الذهبي</a> تقديرًا لموقفهم مع النشامى",
-  sourceNote:
-    "بيانات المنيو والصور والأسعار مبنية على صفحة المطعم الأصلية، ويجب مراجعة الأسعار قبل النشر النهائي.",
+  sourceNote: "",
   branches: [],
   menu: fallbackMenu,
 };
@@ -66,9 +65,9 @@ const uiTranslations = {
     plateHighlight: "أطباق بلدية",
     plateHighlightDesc: "صاجية، كباب، صواني، وسندويشات بروح أردنية واضحة.",
     photoHighlight: "صور حقيقية",
-    photoHighlightDesc: "كل بطاقة طعام تستخدم صورة المنتج من المنيو الأصلي.",
+    photoHighlightDesc: "كل بطاقة طعام تعرض الطبق بوضوح لتسهيل اختيار الزبون.",
     priceHighlight: "أسعار مباشرة",
-    priceHighlightDesc: "الأسعار بالدينار الأردني كما ظهرت في المصدر.",
+    priceHighlightDesc: "الأسعار بالدينار الأردني مرتبة ومقروءة داخل كل صنف.",
     heritageEyebrow: "أصالة وتراث",
     heritageTitle: "قصة الأكل الي على الشوارب",
     heritageP1: "من قلب عمان النابض، انطلقنا لنحيي تراث الطهي البلدي الأردني الأصيل. في غماس بلدي، لسنا مجرد مطعم؛ نحن حراس النكهة والوصفات المتوارثة التي تصنع بكل كرم ونخوة تليق بالنشامى.",
@@ -80,14 +79,14 @@ const uiTranslations = {
     searchPlaceholder: "ابحث عن كباب، صاجية، عصير...",
     emptyState: "ما لقينا صنف بهذا الاسم. جرب كلمة ثانية.",
     branchesTitle: "غماس بلدي في عمان",
-    branchesSubtitle: "الفروع المعروضة مأخوذة من حساب غماس بلدي والمصادر العامة المتاحة.",
+    branchesSubtitle: "اختار أقرب فرع وتواصل مباشرة مع غماس بلدي.",
     orderReady: "جاهز تطلب؟",
     contactAction: "اتصل أو ابعث واتساب",
-    contactNote: "الطلب والتفاصيل عبر الرقم الرسمي الظاهر في صفحة المطعم.",
+    contactNote: "الطلب والتفاصيل عبر أرقام التواصل المعتمدة لغماس بلدي.",
     instagram: "إنستغرام",
     facebook: "فيسبوك",
     dedication: "إهداء من <a href=\"https://www.dahabweb.com\" target=\"_blank\" rel=\"noreferrer\" class=\"gold-link\" style=\"color: var(--gold); text-decoration: underline; font-weight: 800;\">مؤسسة المسار الذهبي</a> تقديرًا لموقفهم مع النشامى",
-    sourceNote: "بيانات المنيو والصور والأسعار مبنية على صفحة المطعم الأصلية، ويجب مراجعة الأسعار قبل النشر النهائي."
+    sourceNote: ""
   },
   en: {
     story: "Our Story",
@@ -108,7 +107,7 @@ const uiTranslations = {
     plateHighlight: "Traditional Grills",
     plateHighlightDesc: "Sajiah, kebab, trays, and wraps with an authentic Jordanian spirit.",
     photoHighlight: "Real Photos",
-    photoHighlightDesc: "Every dish card uses real photos directly from our original menu.",
+    photoHighlightDesc: "Clear dish photos help guests choose quickly and confidently.",
     priceHighlight: "Direct Prices",
     priceHighlightDesc: "All prices are in Jordanian Dinars (JOD) exactly as listed.",
     heritageEyebrow: "Heritage & Passion",
@@ -122,14 +121,14 @@ const uiTranslations = {
     searchPlaceholder: "Search for kebab, sajiah, juice...",
     emptyState: "No items found matching this name. Try another keyword.",
     branchesTitle: "Ghmaas Baladi in Amman",
-    branchesSubtitle: "Branches list retrieved from official Ghmaas Baladi sources.",
+    branchesSubtitle: "Choose the nearest branch and contact Ghmaas Baladi directly.",
     orderReady: "Ready to Order?",
     contactAction: "Call Us or Send WhatsApp",
     contactNote: "Order directly through the official restaurant numbers.",
     instagram: "Instagram",
     facebook: "Facebook",
     dedication: "Presented by <a href=\"https://www.dahabweb.com\" target=\"_blank\" rel=\"noreferrer\" class=\"gold-link\" style=\"color: var(--gold); text-decoration: underline; font-weight: 800;\">Al-Masar Al-Dahabi Institution</a> in appreciation of their support with the Nashama",
-    sourceNote: "Menu details, photos, and prices are based on the original restaurant menu and should be verified."
+    sourceNote: ""
   }
 };
 
@@ -204,6 +203,41 @@ const descTranslations = {
   "سيخين كباب و سيخ ليه": "Two skewers kebab, one skewer lamb fat",
   "(باشن فروت\\باشن فروت منجا \\مكس بيري\\فروله \\خوخ)": "(Passion Fruit / Passion Mango / Mixed Berry / Strawberry / Peach)",
   "(كلاسك\\باشن فروت\\فراوله\\رازبيري\\بلواوشن\\بطيخ\\ميكس بيري)": "(Classic / Passion Fruit / Strawberry / Raspberry / Blue Ocean / Watermelon / Mixed Berry)"
+};
+
+const categoryDisplayOrder = ["plates", "trays", "sandwiches", "appetizers", "cold-drinks", "hot-drinks"];
+
+const categoryDisplayMeta = {
+  plates: {
+    icon: "flame",
+    ar: { kicker: "الأطباق الرئيسية", subtitle: "مشاوي وصاجيات غماس البلدي للطلب المباشر." },
+    en: { kicker: "Main plates", subtitle: "Signature grills and sajiah dishes ready to order." },
+  },
+  trays: {
+    icon: "chef-hat",
+    ar: { kicker: "الصواني", subtitle: "صواني فاخرة للمشاركة واللمة." },
+    en: { kicker: "Trays", subtitle: "Premium shared trays for gatherings." },
+  },
+  sandwiches: {
+    icon: "wrap-text",
+    ar: { kicker: "السندويش", subtitle: "خيارات سريعة ومشبعة بطابع غماس." },
+    en: { kicker: "Sandwiches", subtitle: "Fast, filling wraps with Ghmaas character." },
+  },
+  appetizers: {
+    icon: "salad",
+    ar: { kicker: "المقبلات", subtitle: "سلطات، حمص، ومقبلات تكمّل السفرة." },
+    en: { kicker: "Appetizers", subtitle: "Salads, hummus, and sides to complete the table." },
+  },
+  "cold-drinks": {
+    icon: "cup-soda",
+    ar: { kicker: "مشروبات باردة", subtitle: "عصائر ومشروبات منعشة مع الوجبة." },
+    en: { kicker: "Cold drinks", subtitle: "Fresh juices and chilled drinks for the meal." },
+  },
+  "hot-drinks": {
+    icon: "coffee",
+    ar: { kicker: "مشروبات ساخنة", subtitle: "قهوة ومشروبات ساخنة بعد الأكل." },
+    en: { kicker: "Hot drinks", subtitle: "Coffee and warm drinks after the meal." },
+  },
 };
 
 /* ─── Preloader with Smooth Percent Counter ─── */
@@ -407,6 +441,25 @@ function normalize(value) {
     .trim();
 }
 
+function getOrderedMenu(sourceMenu = []) {
+  const orderIndex = new Map(categoryDisplayOrder.map((id, index) => [id, index]));
+  return [...sourceMenu].sort((a, b) => {
+    const aIndex = orderIndex.has(a.id) ? orderIndex.get(a.id) : Number.MAX_SAFE_INTEGER;
+    const bIndex = orderIndex.has(b.id) ? orderIndex.get(b.id) : Number.MAX_SAFE_INTEGER;
+    return aIndex - bIndex;
+  });
+}
+
+function getCategoryMeta(category) {
+  const fallback =
+    currentLang === "ar"
+      ? { icon: "utensils", kicker: "قسم من المنيو", subtitle: "أصناف مختارة من قائمة غماس بلدي." }
+      : { icon: "utensils", kicker: "Menu section", subtitle: "Selected items from the Ghmaas Baladi menu." };
+  const meta = categoryDisplayMeta[category.id];
+  if (!meta) return fallback;
+  return { icon: meta.icon, ...(meta[currentLang] || meta.ar || fallback) };
+}
+
 function updateText(selector, value) {
   document.querySelectorAll(selector).forEach((element) => {
     element.textContent = value;
@@ -421,7 +474,7 @@ function updateHref(selector, href) {
 
 /* ─── Apply Bilingual Site Content ─── */
 function applySiteContent() {
-  menu = Array.isArray(site.menu) && site.menu.length ? site.menu : fallbackMenu;
+  menu = getOrderedMenu(Array.isArray(site.menu) && site.menu.length ? site.menu : fallbackMenu);
 
   // Toggle layout states
   document.documentElement.classList.toggle("lang-en", currentLang === "en");
@@ -451,7 +504,12 @@ function applySiteContent() {
   });
   updateText(".hero h1", currentLang === "ar" ? site.brandName : t.brandName);
   updateText(".hero-content p", currentLang === "ar" ? site.heroDescription : t.heroDescription);
-  updateText(".site-footer small", currentLang === "ar" ? site.sourceNote : t.sourceNote);
+  const footerNote = document.querySelector(".site-footer small");
+  if (footerNote) {
+    const note = currentLang === "ar" ? site.sourceNote : t.sourceNote;
+    footerNote.textContent = note || "";
+    footerNote.hidden = !note;
+  }
   updateText(".panel-top strong", `${countItems()} ${t.items}`);
 
   // Dedication HTML rendering
@@ -492,9 +550,7 @@ function applySiteContent() {
 
   const contactDesc = document.querySelector(".contact-band p");
   if (contactDesc) {
-    contactDesc.textContent = currentLang === "ar"
-      ? "الطلب والتفاصيل عبر الرقم الرسمي الظاهر في صفحة المطعم."
-      : "Order and details via the official number shown on the restaurant page.";
+    contactDesc.textContent = t.contactNote;
   }
 
   // Translate Social button labels in Contact Band
@@ -610,9 +666,7 @@ function applySiteContent() {
     
     const contactDesc = contactBand.querySelector("p");
     if (contactDesc) {
-      contactDesc.textContent = currentLang === "ar"
-        ? "الطلب والتفاصيل عبر الرقم الرسمي الظاهر في صفحة المطعم."
-        : "Order and details via the official number shown on the restaurant page.";
+      contactDesc.textContent = t.contactNote;
     }
 
     const whatsappBtnText = contactBand.querySelector(".whatsapp-btn .btn-text");
@@ -721,7 +775,7 @@ function renderTabs() {
   allButton.type = "button";
   allButton.className = "category-tab active";
   allButton.dataset.category = "all";
-  allButton.innerHTML = `<span>${currentLang === "ar" ? "الكل" : "All"}</span><small>${countItems()}</small>`;
+  allButton.innerHTML = `<i data-lucide="layout-grid"></i><span>${currentLang === "ar" ? "الكل" : "All"}</span><small>${countItems()}</small>`;
   tabs.appendChild(allButton);
 
   menu.forEach((category) => {
@@ -731,13 +785,17 @@ function renderTabs() {
     button.dataset.category = category.id;
 
     const translatedTitle = currentLang === "ar" ? category.title : (menuTranslations[category.id]?.title || category.title);
+    const meta = getCategoryMeta(category);
 
     button.innerHTML = `
+      <i data-lucide="${meta.icon}"></i>
       <span>${translatedTitle}</span>
       <small>${(category.items || []).length}</small>
     `;
     tabs.appendChild(button);
   });
+
+  if (window.lucide) window.lucide.createIcons();
 }
 
 /* ─── Filtering & Search ─── */
@@ -819,12 +877,18 @@ function renderMenu() {
     group.className = "menu-category reveal-ready";
     
     const translatedCategoryTitle = currentLang === "ar" ? category.title : (menuTranslations[category.id]?.title || category.title);
+    const meta = getCategoryMeta(category);
 
     group.innerHTML = `
       <div class="category-heading">
-        <div>
-          <span>${category.items.length} ${currentLang === "ar" ? "صنف" : "items"}</span>
+        <div class="category-title-block">
+          <span class="category-kicker"><i data-lucide="${meta.icon}"></i>${meta.kicker}</span>
           <h3>${translatedCategoryTitle}</h3>
+          <p>${meta.subtitle}</p>
+        </div>
+        <div class="category-count" aria-label="${category.items.length} ${currentLang === "ar" ? "صنف" : "items"}">
+          <strong>${category.items.length}</strong>
+          <span>${currentLang === "ar" ? "صنف" : "items"}</span>
         </div>
       </div>
     `;
