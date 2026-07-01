@@ -3594,6 +3594,7 @@ html[dir="rtl"] .admin-layout {
 .admin-field input,
 .admin-field textarea,
 .login-card input {
+  font-family: var(--font-body) !important;
   border: 1px solid rgba(212, 168, 83, 0.16) !important;
   border-radius: 12px !important;
   background: rgba(255, 255, 255, 0.055) !important;
@@ -3735,5 +3736,92 @@ html[dir="rtl"] .admin-layout {
 
   .admin-item-row {
     grid-template-columns: 1fr !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE RESPONSIVENESS FIXES FOR PHONE (BULLETPROOF)
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .admin-body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+
+  .admin-shell {
+    width: 100% !important;
+    padding: 10px !important;
+    margin: 0 auto !important;
+  }
+
+  .login-card {
+    padding: 20px !important;
+    width: 100% !important;
+    margin-top: 5vh !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  .login-card h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .login-card p {
+    font-size: 0.85rem !important;
+    margin-bottom: 16px !important;
+  }
+
+  .panel-card {
+    padding: 15px !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  .content-header {
+    padding: 15px !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  .content-header h1 {
+    font-size: 1.25rem !important;
+  }
+
+  .admin-sidebar {
+    padding: 16px !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  .sidebar-brand {
+    padding: 16px !important;
+    margin: -16px -16px 16px -16px !important;
+  }
+
+  .sidebar-brand h2 {
+    font-size: 1rem !important;
+  }
+
+  .nav-tab {
+    padding: 10px 12px !important;
+    font-size: 0.8rem !important;
+    gap: 8px !important;
+  }
+
+  .admin-grid {
+    gap: 12px !important;
+  }
+
+  .admin-edit-card {
+    padding: 12px !important;
+  }
+
+  .admin-item-row {
+    padding: 10px !important;
+    gap: 10px !important;
+  }
+
+  .image-uploader-card {
+    min-height: 140px !important;
+  }
+
+  .uploader-placeholder {
+    padding: 20px !important;
   }
 }
