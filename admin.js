@@ -323,7 +323,7 @@ function renderMenu() {
         }),
         makeField("الصورة", item.image, (value) => {
           item.image = value;
-        }),
+        }, "image"),
         makeIconButton("trash-2", "حذف الصنف", () => {
           category.items.splice(itemIndex, 1);
           renderMenu();

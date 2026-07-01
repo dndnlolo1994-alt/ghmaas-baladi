@@ -3824,6 +3824,12 @@ html[dir="rtl"] .admin-layout {
   .uploader-placeholder {
     padding: 20px !important;
   }
+
+  .admin-field input,
+  .admin-field textarea,
+  .login-card input {
+    font-size: 16px !important;
+  }
 }
 
 /* Classy Cart Branch Buttons */
