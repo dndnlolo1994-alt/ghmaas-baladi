@@ -1,6 +1,7 @@
 /* ═══════════════════════════════════════════════════════════
    غماس بلدي — Ultra-Luxury Script
    Preloader, Particle canvas, Follower Cursor, Sparkles, Magnetic Buttons
+   Bilingual AR/EN Support
    ═══════════════════════════════════════════════════════════ */
 
 const fallbackMenu = window.GHMAAS_MENU || [];
@@ -31,7 +32,7 @@ let site = {
   facebook: "https://www.facebook.com/profile.php?id=61568075303841",
   mapUrl: "https://maps.app.goo.gl/UJLZoKhrjdQJPzec7?g_st=ic",
   taxNote: "يضاف 8% ضريبة مبيعات على الأسعار.",
-  dedication: "إهداء من المسار الذهبي بسبب وقتهم من النشامى",
+  dedication: "إهداء من <a href=\"https://www.dahabweb.com\" target=\"_blank\" rel=\"noreferrer\" class=\"gold-link\" style=\"color: var(--gold); text-decoration: underline; font-weight: 800;\">مؤسسة المسار الذهبي</a> تقديرًا لموقفهم مع النشامى",
   sourceNote:
     "بيانات المنيو والصور والأسعار مبنية على صفحة المطعم الأصلية، ويجب مراجعة الأسعار قبل النشر النهائي.",
   branches: [],
@@ -42,33 +43,206 @@ let menu = fallbackMenu;
 let activeCategory = "all";
 let searchTerm = "";
 let revealObserver = null;
+let currentLang = localStorage.getItem("ghmaas_lang") || "ar";
 
-/* ─── Preloader ─── */
+/* ─── Translations Object ─── */
+const uiTranslations = {
+  ar: {
+    story: "قصتنا",
+    menu: "المنيو",
+    branches: "الفروع",
+    contact: "تواصل",
+    brandName: "غماس بلدي",
+    tagline: "أكل على الشوارب",
+    heroLocation: "عمان - شارع المدينة المنورة",
+    heroDescription: "شغلتنا و عملتنا الاكل الي على الشوارب. منيو عربي فخم للأطباق البلدية، المشاوي، الصواني، الساندويشات، والمشروبات بأسعار واضحة وصور حقيقية.",
+    exploreMenu: "شوف المنيو",
+    openMap: "افتح الخريطة",
+    todaysMenu: "منيو اليوم",
+    taxNote: "يضاف 8% ضريبة مبيعات على الأسعار.",
+    mostPopular: "الأكثر حضوراً",
+    from: "من",
+    items: "صنف",
+    plateHighlight: "أطباق بلدية",
+    plateHighlightDesc: "صاجية، كباب، صواني، وسندويشات بروح أردنية واضحة.",
+    photoHighlight: "صور حقيقية",
+    photoHighlightDesc: "كل بطاقة طعام تستخدم صورة المنتج من المنيو الأصلي.",
+    priceHighlight: "أسعار مباشرة",
+    priceHighlightDesc: "الأسعار بالدينار الأردني كما ظهرت في المصدر.",
+    heritageEyebrow: "أصالة وتراث",
+    heritageTitle: "قصة الأكل الي على الشوارب",
+    heritageP1: "من قلب عمان النابض، انطلقنا لنحيي تراث الطهي البلدي الأردني الأصيل. في غماس بلدي، لسنا مجرد مطعم؛ نحن حراس النكهة والوصفات المتوارثة التي تصنع بكل كرم ونخوة تليق بالنشامى.",
+    heritageP2: "نختار لحومنا ومكوناتنا البلدية الطازجة بعناية فائقة، ونطهوها بشغف لتقدم لكم الصاجيات الفواحة، الكباب البلدي، والصواني الفاخرة بطعم ينقش في الذاكرة.",
+    heritageSignature: "النشامى في خدمتكم دائمًا",
+    heritageBadge: "كرم أردني أصيل",
+    menuTitle: "اختار مزاجك",
+    menuSubtitle: "ابحث باسم الطبق أو تنقل بين الأقسام بسرعة.",
+    searchPlaceholder: "ابحث عن كباب، صاجية، عصير...",
+    emptyState: "ما لقينا صنف بهذا الاسم. جرب كلمة ثانية.",
+    branchesTitle: "غماس بلدي في عمان",
+    branchesSubtitle: "الفروع المعروضة مأخوذة من حساب غماس بلدي والمصادر العامة المتاحة.",
+    orderReady: "جاهز تطلب؟",
+    contactAction: "اتصل أو ابعث واتساب",
+    contactNote: "الطلب والتفاصيل عبر الرقم الرسمي الظاهر في صفحة المطعم.",
+    instagram: "إنستغرام",
+    facebook: "فيسبوك",
+    dedication: "إهداء من <a href=\"https://www.dahabweb.com\" target=\"_blank\" rel=\"noreferrer\" class=\"gold-link\" style=\"color: var(--gold); text-decoration: underline; font-weight: 800;\">مؤسسة المسار الذهبي</a> تقديرًا لموقفهم مع النشامى",
+    sourceNote: "بيانات المنيو والصور والأسعار مبنية على صفحة المطعم الأصلية، ويجب مراجعة الأسعار قبل النشر النهائي."
+  },
+  en: {
+    story: "Our Story",
+    menu: "Menu",
+    branches: "Branches",
+    contact: "Contact",
+    brandName: "Ghmaas Baladi",
+    tagline: "Authentic Jordanian Grills",
+    heroLocation: "Amman - Al-Madina Al-Munawarah St.",
+    heroDescription: "Our specialty is authentic premium Jordanian grills, Sajiah, and traditional oven trays served with true local hospitality.",
+    exploreMenu: "Explore Menu",
+    openMap: "Open Map",
+    todaysMenu: "Today's Menu",
+    taxNote: "8% sales tax is added to prices.",
+    mostPopular: "Most Popular",
+    from: "From",
+    items: "items",
+    plateHighlight: "Traditional Grills",
+    plateHighlightDesc: "Sajiah, kebab, trays, and wraps with an authentic Jordanian spirit.",
+    photoHighlight: "Real Photos",
+    photoHighlightDesc: "Every dish card uses real photos directly from our original menu.",
+    priceHighlight: "Direct Prices",
+    priceHighlightDesc: "All prices are in Jordanian Dinars (JOD) exactly as listed.",
+    heritageEyebrow: "Heritage & Passion",
+    heritageTitle: "The Story of Grills for the Proud",
+    heritageP1: "From the heart of Amman, we set out to revive the authentic Jordanian culinary heritage. At Ghmaas Baladi, we are not just a restaurant; we are the guardians of traditional flavors and recipes passed down with true local generosity.",
+    heritageP2: "We carefully select our fresh local meat and ingredients, cooking them with passion to serve you aromatic Sajiahs, traditional Kebabs, and premium trays.",
+    heritageSignature: "Always at your service with authentic hospitality",
+    heritageBadge: "Authentic Jordanian Generosity",
+    menuTitle: "Select Your Mood",
+    menuSubtitle: "Search by dish name or navigate categories quickly.",
+    searchPlaceholder: "Search for kebab, sajiah, juice...",
+    emptyState: "No items found matching this name. Try another keyword.",
+    branchesTitle: "Ghmaas Baladi in Amman",
+    branchesSubtitle: "Branches list retrieved from official Ghmaas Baladi sources.",
+    orderReady: "Ready to Order?",
+    contactAction: "Call Us or Send WhatsApp",
+    contactNote: "Order directly through the official restaurant numbers.",
+    instagram: "Instagram",
+    facebook: "Facebook",
+    dedication: "Presented by <a href=\"https://www.dahabweb.com\" target=\"_blank\" rel=\"noreferrer\" class=\"gold-link\" style=\"color: var(--gold); text-decoration: underline; font-weight: 800;\">Al-Masar Al-Dahabi Institution</a> in appreciation of their support with the Nashama",
+    sourceNote: "Menu details, photos, and prices are based on the original restaurant menu and should be verified."
+  }
+};
+
+const menuTranslations = {
+  // Categories
+  "plates": { title: "Ghmaas Baladi Plates" },
+  "trays": { title: "Trays" },
+  "sandwiches": { title: "Sandwiches" },
+  "appetizers": { title: "Appetizers" },
+  "cold-drinks": { title: "Cold Drinks" },
+  "hot-drinks": { title: "Hot Drinks" },
+  
+  // Dishes
+  "مشكل غماس": { name: "Ghmaas Mixed Grill", desc: "1.5 KG" },
+  "كيلو كباب": { name: "1 KG Kebab", desc: "" },
+  "نص كيلو كباب": { name: "0.5 KG Kebab", desc: "" },
+  "صاجيه لحمه": { name: "Meat Sajiah", desc: "" },
+  "صاجيه معلاق": { name: "Ma'alaq Sajiah", desc: "" },
+  "صاجيه دجاج": { name: "Chicken Sajiah", desc: "" },
+  "قلايه بندوره باللحمه": { name: "Tomato Pan with Meat", desc: "" },
+  "حمص باللحمه": { name: "Hummus with Meat", desc: "" },
+  "كفته بالبندوره": { name: "Kofta with Tomato", desc: "" },
+  "كفته بطحينيه": { name: "Kofta with Tahini", desc: "" },
+  "صينيه زهره و لحمه مفرومه بالطحينيه": { name: "Cauliflower & Minced Meat with Tahini", desc: "" },
+  "فوارغ": { name: "Fawaregh", desc: "" },
+  "سلطيه": { name: "Saltiah Sandwich", desc: "Two skewers liver, one skewer lamb fat" },
+  "شيش طاووق": { name: "Shish Taouk", desc: "" },
+  "لف غمس دجاج": { name: "Ghmaas Chicken Wrap", desc: "" },
+  "لف غماس لحم": { name: "Ghmaas Meat Wrap", desc: "" },
+  "روسيه": { name: "Russian Sandwich", desc: "Two skewers kebab, one skewer lamb fat" },
+  "كباب لحمه": { name: "Meat Kebab", desc: "" },
+  "كباب بالباذنجان": { name: "Eggplant Kebab", desc: "" },
+  "كباب دجاج بالجبنه": { name: "Chicken Kebab with Cheese", desc: "" },
+  "معلاق": { name: "Ma'alaq (Liver)", desc: "" },
+  "ليّة": { name: "Liyah (Lamb Fat)", desc: "" },
+  "سلطه نار": { name: "Fire Salad", desc: "" },
+  "بطاطا": { name: "French Fries", desc: "" },
+  "بقدونسيه": { name: "Parsley Salad", desc: "" },
+  "صحن حمص": { name: "Hummus Plate", desc: "" },
+  "صحن متبل": { name: "Mutabbal Plate", desc: "" },
+  "سلطه خيار بلبن": { name: "Cucumber Yogurt Salad", desc: "" },
+  "صحن رز ابيض": { name: "White Rice Plate", desc: "" },
+  "برغل": { name: "Bulgur", desc: "" },
+  "سلطه طحينيه": { name: "Tahini Salad", desc: "" },
+  "سلطه حاره": { name: "Spicy Salad", desc: "" },
+  "سلطه جرجير": { name: "Arugula Salad", desc: "" },
+  "سلطه عربيه": { name: "Arabic Salad", desc: "" },
+  "سلطه غماس": { name: "Ghmaas Salad", desc: "" },
+  "رشوف": { name: "Rashouf", desc: "" },
+  "سلطه فتوش": { name: "Fattoush Salad", desc: "" },
+  "بصلية": { name: "Basliyah", desc: "" },
+  "حمص بيروتي": { name: "Beiruti Hummus", desc: "" },
+  "عصير برتقال": { name: "Orange Juice", desc: "" },
+  "عصير فراوله": { name: "Strawberry Juice", desc: "" },
+  "عصير منجا": { name: "Mango Juice", desc: "" },
+  "عصير منجا فراوله": { name: "Mango Strawberry Juice", desc: "" },
+  "عصير كيوي": { name: "Kiwi Juice", desc: "" },
+  "عصير ليمون ونعنع": { name: "Lemon Mint Juice", desc: "" },
+  "عصير افوكادو": { name: "Avocado Juice", desc: "" },
+  "مكس فروت": { name: "Mixed Fruit Juice", desc: "" },
+  "عصير رمان": { name: "Pomegranate Juice", desc: "" },
+  "سموذي": { name: "Smoothie", desc: "(Passion Fruit / Passion Mango / Mixed Berry / Strawberry / Peach)" },
+  "موهيتو": { name: "Mojito", desc: "(Classic / Passion Fruit / Strawberry / Raspberry / Blue Ocean / Watermelon / Mixed Berry)" },
+  "قهوه تركية": { name: "Turkish Coffee", desc: "" },
+  "هوت شوكليت": { name: "Hot Chocolate", desc: "" }
+};
+
+const descTranslations = {
+  "كيلو و نص": "1.5 KG",
+  "نص كيلو": "0.5 KG",
+  "سيخين معلاق و سيخ ليه": "Two skewers liver, one skewer lamb fat",
+  "سيخين كباب و سيخ ليه": "Two skewers kebab, one skewer lamb fat",
+  "(باشن فروت\\باشن فروت منجا \\مكس بيري\\فروله \\خوخ)": "(Passion Fruit / Passion Mango / Mixed Berry / Strawberry / Peach)",
+  "(كلاسك\\باشن فروت\\فراوله\\رازبيري\\بلواوشن\\بطيخ\\ميكس بيري)": "(Classic / Passion Fruit / Strawberry / Raspberry / Blue Ocean / Watermelon / Mixed Berry)"
+};
+
+/* ─── Preloader with Smooth Percent Counter ─── */
 function initPreloader() {
   const preloader = document.getElementById("luxuryPreloader");
+  const percentEl = document.querySelector(".preloader-percent");
   if (!preloader) return;
 
-  // Fade out preloader when loading is finished
-  window.addEventListener("load", () => {
-    setTimeout(() => {
-      preloader.classList.add("fade-out");
+  let currentPercent = 0;
+  const interval = setInterval(() => {
+    currentPercent += Math.floor(Math.random() * 15) + 5;
+    if (currentPercent >= 100) {
+      currentPercent = 100;
+      clearInterval(interval);
       setTimeout(() => {
-        preloader.style.display = "none";
-      }, 800);
-    }, 1000);
-  });
-
-  // Fallback in case load event takes too long
-  setTimeout(() => {
-    if (!preloader.classList.contains("fade-out")) {
-      preloader.classList.add("fade-out");
-      setTimeout(() => {
-        preloader.style.display = "none";
-      }, 800);
+        preloader.classList.add("fade-out");
+        setTimeout(() => {
+          preloader.style.display = "none";
+        }, 800);
+      }, 300);
     }
-  }, 3000);
-}
+    if (percentEl) percentEl.textContent = `${currentPercent}%`;
+  }, 60);
 
+  // Fallback in case loading gets stuck
+  window.addEventListener("load", () => {
+    // Ensures preloader fades out when load event occurs if progress bar hasn't triggered it yet
+    setTimeout(() => {
+      if (!preloader.classList.contains("fade-out")) {
+        clearInterval(interval);
+        if (percentEl) percentEl.textContent = "100%";
+        preloader.classList.add("fade-out");
+        setTimeout(() => {
+          preloader.style.display = "none";
+        }, 800);
+      }
+    }, 600);
+  });
+}
 
 /* ─── Particle System Background ─── */
 function initParticles() {
@@ -245,31 +419,60 @@ function updateHref(selector, href) {
   });
 }
 
-/* ─── Apply Site Content ─── */
+/* ─── Apply Bilingual Site Content ─── */
 function applySiteContent() {
   menu = Array.isArray(site.menu) && site.menu.length ? site.menu : fallbackMenu;
 
-  document.title = `${site.brandName} | منيو وتجربة فاخرة`;
-  updateText(".brand-lockup strong, .footer-brand strong", site.brandName);
-  updateText(".brand-lockup small", site.tagline);
-  updateText(".hero h1", site.brandName);
-  updateText(".hero-content p", site.heroDescription);
+  // Toggle layout states
+  document.documentElement.classList.toggle("lang-en", currentLang === "en");
+  document.documentElement.classList.toggle("lang-ar", currentLang === "ar");
+  document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
+  document.documentElement.lang = currentLang;
+
+  const t = uiTranslations[currentLang];
+
+  // Document Title
+  document.title = currentLang === "ar" ? `${site.brandName} | منيو وتجربة فاخرة` : `${t.brandName} | Luxury Menu Experience`;
+
+  // Header Nav Links
+  const navLinks = document.querySelectorAll(".desktop-nav a");
+  if (navLinks.length >= 4) {
+    navLinks[0].textContent = t.story;
+    navLinks[1].textContent = t.menu;
+    navLinks[2].textContent = t.branches;
+    navLinks[3].textContent = t.contact;
+  }
+
+  // Brand identity
+  updateText(".brand-lockup strong, .footer-brand strong", currentLang === "ar" ? site.brandName : t.brandName);
+  updateText(".brand-lockup small", currentLang === "ar" ? site.tagline : t.tagline);
+  updateText(".hero h1", currentLang === "ar" ? site.brandName : t.brandName);
+  updateText(".hero-content p", currentLang === "ar" ? site.heroDescription : t.heroDescription);
+  updateText(".site-footer small", currentLang === "ar" ? site.sourceNote : t.sourceNote);
+  updateText(".panel-top strong", `${countItems()} ${t.items}`);
+
+  // Dedication HTML rendering
   const dedicationEl = document.querySelector(".dedication");
   if (dedicationEl) {
-    dedicationEl.innerHTML = site.dedication;
+    dedicationEl.innerHTML = currentLang === "ar" ? site.dedication : t.dedication;
   }
-  updateText(".site-footer small", site.sourceNote);
-  updateText(".panel-top strong", `${countItems()} صنف`);
 
+  // Tax note
   const taxNote = document.querySelector(".tax-note");
-  if (taxNote) taxNote.innerHTML = `<i data-lucide="receipt-text"></i>${site.taxNote || ""}`;
+  if (taxNote) {
+    taxNote.innerHTML = `<i data-lucide="receipt-text"></i>${currentLang === "ar" ? (site.taxNote || "") : t.taxNote}`;
+  }
 
-  const eyebrow = document.querySelector(".eyebrow");
-  if (eyebrow) eyebrow.innerHTML = `<span></span>${site.heroLocation || ""}`;
+  // Location Eyebrow
+  const eyebrow = document.querySelector(".hero-content .eyebrow");
+  if (eyebrow) {
+    eyebrow.innerHTML = `<span></span>${currentLang === "ar" ? (site.heroLocation || "") : t.heroLocation}`;
+  }
 
+  // Logos and links
   document.querySelectorAll(".brand-lockup img, .footer-brand img").forEach((image) => {
     image.src = site.logo;
-    image.alt = site.brandName;
+    image.alt = currentLang === "ar" ? site.brandName : t.brandName;
   });
 
   updateHref('a[href^="tel:"]', `tel:${site.phoneInternational || site.phone || ""}`);
@@ -277,17 +480,30 @@ function applySiteContent() {
   updateHref('a[href*="instagram.com"]', site.instagram || "#");
   updateHref('a[href*="facebook.com"]', site.facebook || "#");
 
+  // Phone Call Action Button
   const phoneButton = document.querySelector(".contact-actions .primary-btn");
   if (phoneButton) {
     phoneButton.href = `tel:${site.phoneInternational || site.phone || ""}`;
     phoneButton.innerHTML = `<i data-lucide="phone-call"></i>${site.phone || ""}`;
   }
 
+  // Map Buttons
   const mapButtons = document.querySelectorAll('a[href*="maps.app"], a[href*="google.com/maps"]');
   mapButtons.forEach((button) => {
     button.href = site.mapUrl || "#branches";
   });
 
+  // Hero CTAs
+  const heroPrimary = document.querySelector(".hero-actions .primary-btn");
+  if (heroPrimary) {
+    heroPrimary.innerHTML = `<i data-lucide="utensils"></i>${t.exploreMenu}`;
+  }
+  const heroSecondary = document.querySelector(".hero-actions .secondary-btn");
+  if (heroSecondary) {
+    heroSecondary.innerHTML = `<i data-lucide="map-pin"></i>${t.openMap}`;
+  }
+
+  // Hero Images
   const heroImages = document.querySelectorAll(".hero-media img");
   heroImages.forEach((image, index) => {
     if (site.heroImages?.[index]) image.src = site.heroImages[index];
@@ -298,16 +514,89 @@ function applySiteContent() {
     document.documentElement.style.setProperty("--hero-image", `url("${heroBackground}")`);
   }
 
+  // Featured Dish Side Card
   const featured = menu.flatMap((category) => category.items || [])[0];
   if (featured) {
-    updateText(".featured-dish strong", featured.name);
-    updateText(".featured-dish span", `من ${featured.price}`);
+    const featuredTitle = currentLang === "ar" ? featured.name : (menuTranslations[featured.name]?.name || featured.name);
+    updateText(".featured-dish strong", featuredTitle);
+    updateText(".featured-dish span", `${t.from} ${featured.price}`);
+    updateText(".panel-top span", t.todaysMenu);
+    updateText(".featured-dish small", t.mostPopular);
     const featuredImage = document.querySelector(".featured-dish img");
     if (featuredImage) {
       featuredImage.src = featured.image;
-      featuredImage.alt = featured.name;
+      featuredImage.alt = featuredTitle;
     }
   }
+
+  // Highlights Section
+  const highlightArticles = document.querySelectorAll(".highlights article");
+  if (highlightArticles.length >= 3) {
+    highlightArticles[0].querySelector("strong").textContent = t.plateHighlight;
+    highlightArticles[0].querySelector("span").textContent = t.plateHighlightDesc;
+    highlightArticles[1].querySelector("strong").textContent = t.photoHighlight;
+    highlightArticles[1].querySelector("span").textContent = t.photoHighlightDesc;
+    highlightArticles[2].querySelector("strong").textContent = t.priceHighlight;
+    highlightArticles[2].querySelector("span").textContent = t.priceHighlightDesc;
+  }
+
+  // Heritage Section
+  const heritageSec = document.querySelector(".heritage");
+  if (heritageSec) {
+    heritageSec.querySelector(".eyebrow").innerHTML = `<span></span>${t.heritageEyebrow}`;
+    heritageSec.querySelector("h2").textContent = t.heritageTitle;
+    const paras = heritageSec.querySelectorAll("p");
+    if (paras.length >= 2) {
+      paras[0].textContent = t.heritageP1;
+      paras[1].textContent = t.heritageP2;
+    }
+    heritageSec.querySelector(".heritage-signature span").textContent = t.heritageSignature;
+    heritageSec.querySelector(".heritage-badge span").textContent = t.heritageBadge;
+  }
+
+  // Menu Search Heading
+  const menuShell = document.querySelector(".menu-shell");
+  if (menuShell) {
+    menuShell.querySelector(".section-heading span").textContent = t.menu;
+    menuShell.querySelector(".section-heading h2").textContent = t.menuTitle;
+    menuShell.querySelector(".section-heading p").textContent = t.menuSubtitle;
+    document.getElementById("menuSearch").placeholder = t.searchPlaceholder;
+    document.getElementById("emptyState").textContent = t.emptyState;
+  }
+
+  // Branches Section
+  const branchesSec = document.querySelector(".branches");
+  if (branchesSec) {
+    branchesSec.querySelector(".section-heading span").textContent = t.branches;
+    branchesSec.querySelector(".section-heading h2").textContent = t.branchesTitle;
+    branchesSec.querySelector(".section-heading p").textContent = t.branchesSubtitle;
+  }
+
+  // Contact Band
+  const contactBand = document.querySelector(".contact-band");
+  if (contactBand) {
+    contactBand.querySelector("span").textContent = t.orderReady;
+    contactBand.querySelector("h2").textContent = t.contactAction;
+    contactBand.querySelector("p").textContent = t.contactNote;
+    const socBtns = contactBand.querySelectorAll(".secondary-btn");
+    if (socBtns.length >= 2) {
+      socBtns[0].innerHTML = `<i data-lucide="instagram"></i>${t.instagram}`;
+      socBtns[1].innerHTML = `<i data-lucide="facebook"></i>${t.facebook}`;
+    }
+  }
+
+  // Dedication Line
+  updateText(".dedication", currentLang === "ar" ? site.dedication : t.dedication);
+
+  // Switch button visual toggle
+  const langBtn = document.getElementById("langSwitcher");
+  if (langBtn) {
+    langBtn.querySelector("span").textContent = currentLang === "ar" ? "EN" : "AR";
+    langBtn.setAttribute("aria-label", currentLang === "ar" ? "Switch to English" : "تغيير للغة العربية");
+  }
+
+  // Reinitialize lucide icons for translated buttons
+  if (window.lucide) window.lucide.createIcons();
 
   renderBranches();
 }
@@ -317,6 +606,7 @@ function renderBranches() {
   if (!branchGrid) return;
   branchGrid.innerHTML = "";
   const branches = Array.isArray(site.branches) ? site.branches : [];
+  const t = uiTranslations[currentLang];
 
   branches.forEach((branch, index) => {
     const article = document.createElement("article");
@@ -324,13 +614,30 @@ function renderBranches() {
       branch.featured || index === 0
         ? "branch-card primary reveal-ready"
         : "branch-card reveal-ready";
+
+    // Translate branch titles if English
+    let branchTitle = branch.title || "فرع";
+    let branchAddress = branch.address || "";
+    if (currentLang === "en") {
+      if (branchTitle.includes("المدينة المنورة")) {
+        branchTitle = "Al-Madina Al-Munawarah St.";
+        branchAddress = "Amman - Jordan";
+      } else if (branchTitle.includes("مكة")) {
+        branchTitle = "Mecca Street";
+        branchAddress = "Al-Dawood Complex - Amman";
+      } else if (branchTitle.includes("طبربور")) {
+        branchTitle = "Tabarbour";
+        branchAddress = "Tank Roundabout - Amman";
+      }
+    }
+
     article.innerHTML = `
       <i data-lucide="${index === 0 ? "map-pin" : index === 1 ? "building-2" : "navigation"}"></i>
-      <strong>${branch.title || "فرع"}</strong>
-      <span>${branch.address || ""}</span>
+      <strong>${branchTitle}</strong>
+      <span>${branchAddress}</span>
       ${
         branch.mapUrl
-          ? `<a href="${branch.mapUrl}" target="_blank" rel="noreferrer">الموقع على الخريطة</a>`
+          ? `<a href="${branch.mapUrl}" target="_blank" rel="noreferrer">${currentLang === "ar" ? "الموقع على الخريطة" : "Location on Map"}</a>`
           : ""
       }
     `;
@@ -347,7 +654,7 @@ function renderTabs() {
   allButton.type = "button";
   allButton.className = "category-tab active";
   allButton.dataset.category = "all";
-  allButton.innerHTML = `<span>الكل</span><small>${countItems()}</small>`;
+  allButton.innerHTML = `<span>${currentLang === "ar" ? "الكل" : "All"}</span><small>${countItems()}</small>`;
   tabs.appendChild(allButton);
 
   menu.forEach((category) => {
@@ -355,15 +662,18 @@ function renderTabs() {
     button.type = "button";
     button.className = "category-tab";
     button.dataset.category = category.id;
+
+    const translatedTitle = currentLang === "ar" ? category.title : (menuTranslations[category.id]?.title || category.title);
+
     button.innerHTML = `
-      <span>${category.title}</span>
+      <span>${translatedTitle}</span>
       <small>${(category.items || []).length}</small>
     `;
     tabs.appendChild(button);
   });
 }
 
-/* ─── Filtering ─── */
+/* ─── Filtering & Search ─── */
 function getVisibleItems() {
   const query = normalize(searchTerm);
 
@@ -373,6 +683,15 @@ function getVisibleItems() {
       ...category,
       items: (category.items || []).filter((item) => {
         if (!query) return true;
+        // In English mode, check English names/descriptions
+        if (currentLang === "en") {
+          const itemTrans = menuTranslations[item.name] || {};
+          const engName = normalize(itemTrans.name || item.name);
+          const engDesc = normalize(itemTrans.desc || item.description);
+          const catTrans = menuTranslations[category.id] || {};
+          const engCat = normalize(catTrans.title || category.title);
+          return `${engName} ${engDesc} ${engCat}`.includes(query);
+        }
         return normalize(`${item.name} ${item.description} ${category.title}`).includes(query);
       }),
     }))
@@ -383,18 +702,33 @@ function getVisibleItems() {
 function createDishCard(item, categoryTitle) {
   const article = document.createElement("article");
   article.className = "dish-card reveal-ready";
-  const message = encodeURIComponent(`مرحبا، بدي اسأل عن ${item.name}`);
+
+  const trans = menuTranslations[item.name] || {};
+  const dishName = currentLang === "ar" ? item.name : (trans.name || item.name);
+  
+  let dishDesc = item.description;
+  if (currentLang === "en") {
+    dishDesc = trans.desc || descTranslations[item.description] || item.description;
+    if (!dishDesc) {
+      dishDesc = "A premium dish from Ghmaas Baladi menu.";
+    }
+  } else if (!dishDesc) {
+    dishDesc = "طبق من قائمة غماس بلدي.";
+  }
+
+  const message = encodeURIComponent(currentLang === "ar" ? `مرحبا، بدي اسأل عن ${item.name}` : `Hello, I'd like to ask about ${dishName}`);
+  
   article.innerHTML = `
     <div class="dish-image">
-      <img src="${item.image}" alt="${item.name}" loading="lazy" decoding="async" />
+      <img src="${item.image}" alt="${dishName}" loading="lazy" decoding="async" />
     </div>
     <div class="dish-content">
       <span class="dish-category">${categoryTitle}</span>
-      <h3>${item.name}</h3>
-      ${item.description ? `<p>${item.description}</p>` : `<p class="muted">طبق من قائمة غماس بلدي.</p>`}
+      <h3>${dishName}</h3>
+      <p>${dishDesc}</p>
       <div class="dish-footer">
         <strong>${item.price}</strong>
-        <a href="https://wa.me/${site.whatsapp || ""}?text=${message}" target="_blank" rel="noreferrer" aria-label="اسأل عن ${item.name}">
+        <a href="https://wa.me/${site.whatsapp || ""}?text=${message}" target="_blank" rel="noreferrer" aria-label="WhatsApp about ${dishName}">
           <i data-lucide="message-circle"></i>
         </a>
       </div>
@@ -403,7 +737,7 @@ function createDishCard(item, categoryTitle) {
   return article;
 }
 
-/* ─── Render Menu ─── */
+/* ─── Render Menu with Cascading Stagger delays ─── */
 function renderMenu() {
   grid.innerHTML = "";
   const visible = getVisibleItems();
@@ -411,18 +745,28 @@ function renderMenu() {
   visible.forEach((category) => {
     const group = document.createElement("section");
     group.className = "menu-category reveal-ready";
+    
+    const translatedCategoryTitle = currentLang === "ar" ? category.title : (menuTranslations[category.id]?.title || category.title);
+
     group.innerHTML = `
       <div class="category-heading">
         <div>
-          <span>${category.items.length} صنف</span>
-          <h3>${category.title}</h3>
+          <span>${category.items.length} ${currentLang === "ar" ? "صنف" : "items"}</span>
+          <h3>${translatedCategoryTitle}</h3>
         </div>
       </div>
     `;
 
     const cards = document.createElement("div");
     cards.className = "dish-grid";
-    category.items.forEach((item) => cards.appendChild(createDishCard(item, category.title)));
+    
+    category.items.forEach((item, itemIndex) => {
+      const card = createDishCard(item, translatedCategoryTitle);
+      // Cascading stagger delay
+      card.style.animationDelay = `${itemIndex * 40}ms`;
+      cards.appendChild(card);
+    });
+
     group.appendChild(cards);
     grid.appendChild(group);
   });
@@ -473,6 +817,20 @@ function bindEvents() {
         }
       }, { passive: true });
     }
+  }
+
+  // Language Switcher Button Click
+  const langBtn = document.getElementById("langSwitcher");
+  if (langBtn) {
+    langBtn.addEventListener("click", () => {
+      currentLang = currentLang === "ar" ? "en" : "ar";
+      localStorage.setItem("ghmaas_lang", currentLang);
+      
+      // Instantly swap content
+      applySiteContent();
+      renderTabs();
+      setActiveCategory(activeCategory);
+    });
   }
 }
 

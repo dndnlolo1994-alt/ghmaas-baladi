@@ -2095,3 +2095,66 @@ input {
   background: rgba(212, 168, 83, 0.3);
   color: var(--cream);
 }
+
+/* ─── Bilingual Styles & Directions ─── */
+html.lang-en body {
+  font-family: 'Outfit', sans-serif;
+}
+
+html.lang-en h1,
+html.lang-en h2,
+html.lang-en h3,
+html.lang-en .featured-dish strong,
+html.lang-en .branch-card strong,
+html.lang-en .preloader-logo,
+html.lang-en .heritage-content h2,
+html.lang-en .section-heading h2 {
+  font-family: 'Playfair Display', serif;
+  letter-spacing: -0.01em;
+}
+
+html[dir="rtl"] .hero-media {
+  right: 24px;
+  left: auto;
+}
+
+html[dir="ltr"] .hero-media {
+  left: 24px;
+  right: auto;
+}
+
+html[dir="rtl"] .gold-line.start {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+html[dir="ltr"] .gold-line.start {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+/* Stagger card fade-in animation */
+.dish-card {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: cardFadeIn 0.5s var(--ease-out) forwards;
+}
+
+@keyframes cardFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Language Switcher transitions */
+#langSwitcher {
+  transition: transform var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+
+#langSwitcher:hover {
+  transform: scale(1.1) rotate(5deg);
+  border-color: var(--gold-light);
+  background: rgba(212, 168, 83, 0.15);
+}
+

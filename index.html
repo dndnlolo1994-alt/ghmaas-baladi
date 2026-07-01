@@ -16,16 +16,14 @@
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://amenomenu.com/images/users_logos/417_1763249008.png" />
     <link rel="icon" href="https://amenomenu.com/images/users_logos/417_1763249008.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=El+Messiri:wght@500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Reem+Kufi:wght@500;600;700&display=swap"
+        <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=El+Messiri:wght@500;600;700&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Reem+Kufi:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
     <script src="./menu-data.js" defer></script>
-    <script src="./script.js?v=luxury-ultra-3" defer></script>
-    <link rel="stylesheet" href="./styles.css?v=luxury-ultra-3" />
+    <script src="./script.js?v=luxury-bilingual-4" defer></script>
+    <link rel="stylesheet" href="./styles.css?v=luxury-bilingual-4" />
   </head>
   <body>
     <!-- Premium Preloader -->
@@ -37,9 +35,9 @@
         <div class="preloader-progress-bar">
           <div class="preloader-progress"></div>
         </div>
+        <div class="preloader-percent" style="color: var(--gold); font-weight: 800; margin-top: 10px; font-family: var(--font-title);">0%</div>
       </div>
     </div>
-
 
     <!-- Particle Background Canvas -->
     <canvas id="particleCanvas" aria-hidden="true"></canvas>
@@ -70,12 +68,15 @@
       </nav>
 
       <div class="header-actions">
+        <!-- Language Switcher -->
+        <button id="langSwitcher" class="icon-btn magnetic-btn" style="font-weight: 800; font-size: 0.8rem; color: var(--gold);" aria-label="Switch to English">
+          <span>EN</span>
+        </button>
         <a class="icon-btn" href="tel:+962798181200" aria-label="اتصال">
           <i data-lucide="phone"></i>
         </a>
         <a class="icon-btn accent" href="https://wa.me/962798181200" target="_blank" rel="noreferrer" aria-label="واتساب">
           <i data-lucide="message-circle"></i>
-        </a>
       </div>
     </header>
 
