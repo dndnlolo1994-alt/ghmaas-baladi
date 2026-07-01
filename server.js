@@ -3,6 +3,7 @@ const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const { URL } = require("node:url");
+const { Pool } = require("pg");
 
 const root = __dirname;
 const dataDir = path.join(root, "data");
@@ -10,6 +11,21 @@ const dataFile = path.join(dataDir, "site.json");
 const port = Number(process.env.PORT || 5174);
 const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
 const sessions = new Set();
+
+// Supabase PostgreSQL Connection Pool
+const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:CI8FYeO8Lxa2cF9H@db.ijyidjhsixumlomobjpt.supabase.co:5432/postgres";
+let pool;
+try {
+  pool = new Pool({
+    connectionString: dbUrl,
+    ssl: dbUrl.includes("supabase.co") ? { rejectUnauthorized: false } : false,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+  });
+} catch (e) {
+  console.error("Failed to initialize database pool:", e);
+}
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
@@ -109,6 +125,48 @@ function writeSite(site) {
   return next;
 }
 
+async function readSiteDb() {
+  if (pool) {
+    try {
+      const result = await pool.query("SELECT data FROM public.site_settings WHERE id = 1;");
+      if (result.rows.length > 0) {
+        return result.rows[0].data;
+      }
+    } catch (error) {
+      console.error("Database read error, falling back to local file:", error);
+    }
+  }
+  return readSite();
+}
+
+async function writeSiteDb(site) {
+  const next = {
+    ...site,
+    updatedAt: new Date().toISOString(),
+  };
+  if (!Array.isArray(next.menu)) next.menu = [];
+  if (!Array.isArray(next.branches)) next.branches = [];
+  if (!Array.isArray(next.heroImages)) next.heroImages = [];
+
+  try {
+    fs.writeFileSync(dataFile, JSON.stringify(next, null, 2), "utf8");
+  } catch (err) {
+    console.error("Failed to write local backup site.json:", err);
+  }
+
+  if (pool) {
+    try {
+      await pool.query(
+        "INSERT INTO public.site_settings (id, data, updated_at) VALUES (1, $1, now()) ON CONFLICT (id) DO UPDATE SET data = $1, updated_at = now();",
+        [JSON.stringify(next)]
+      );
+    } catch (error) {
+      console.error("Database write error:", error);
+    }
+  }
+  return next;
+}
+
 function sendJson(res, status, body, headers = {}) {
   res.writeHead(status, {
     "content-type": "application/json; charset=utf-8",
@@ -172,7 +230,7 @@ function safeFilePath(pathname) {
 
 async function handleApi(req, res, pathname) {
   if (req.method === "GET" && pathname === "/api/site") {
-    sendJson(res, 200, readSite());
+    sendJson(res, 200, await readSiteDb());
     return true;
   }
 
@@ -210,7 +268,7 @@ async function handleApi(req, res, pathname) {
       return true;
     }
     const body = await readBody(req);
-    sendJson(res, 200, writeSite(body));
+    sendJson(res, 200, await writeSiteDb(body));
     return true;
   }
 
@@ -223,22 +281,40 @@ async function handleApi(req, res, pathname) {
     const filename = url.searchParams.get("filename") || "upload.png";
     const safeFilename = path.basename(filename).replace(/[^a-zA-Z0-9.-]/g, "_");
 
+    // Unique filename using a timestamp prefix to avoid conflicts
+    const uniqueFilename = `${Date.now()}_${safeFilename}`;
+    const ext = path.extname(safeFilename).toLowerCase();
+    const mime = mimeTypes[ext] || "image/png";
+
+    // Read the incoming binary upload payload fully into memory
+    const chunks = [];
+    for await (const chunk of req) {
+      chunks.push(chunk);
+    }
+    const buffer = Buffer.concat(chunks);
+
+    if (pool) {
+      try {
+        await pool.query(
+          "INSERT INTO public.uploaded_images (name, mime_type, content) VALUES ($1, $2, $3) ON CONFLICT (name) DO UPDATE SET mime_type = $2, content = $3;",
+          [uniqueFilename, mime, buffer]
+        );
+        sendJson(res, 200, { url: `/uploads/${uniqueFilename}` });
+        return true;
+      } catch (error) {
+        console.error("Failed to upload image to database:", error);
+      }
+    }
+
+    // Fallback: local disk storage
     const uploadsDir = path.join(root, "uploads");
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
+    const targetPath = path.join(uploadsDir, uniqueFilename);
+    fs.writeFileSync(targetPath, buffer);
 
-    const targetPath = path.join(uploadsDir, safeFilename);
-    const writeStream = fs.createWriteStream(targetPath);
-    req.pipe(writeStream);
-
-    await new Promise((resolve, reject) => {
-      writeStream.on("finish", resolve);
-      writeStream.on("error", reject);
-      req.on("error", reject);
-    });
-
-    sendJson(res, 200, { url: `/uploads/${safeFilename}` });
+    sendJson(res, 200, { url: `/uploads/${uniqueFilename}` });
     return true;
   }
 
@@ -257,6 +333,46 @@ const server = http.createServer(async (req, res) => {
     }
 
     const requestedPath = pathname === "/admin" ? "/admin.html" : pathname;
+
+    // Handle uploaded file serving from Database with Disk Fallback
+    if (requestedPath.startsWith("/uploads/")) {
+      const filename = path.basename(requestedPath);
+      if (pool) {
+        try {
+          const result = await pool.query(
+            "SELECT content, mime_type FROM public.uploaded_images WHERE name = $1;",
+            [filename]
+          );
+          if (result.rows.length > 0) {
+            const row = result.rows[0];
+            res.writeHead(200, {
+              "content-type": row.mime_type,
+              "cache-control": "public, max-age=31536000, immutable",
+            });
+            res.end(row.content);
+            return;
+          }
+        } catch (error) {
+          console.error("Error reading image from database:", error);
+        }
+      }
+
+      // Local disk fallback
+      const localFilePath = path.join(root, "uploads", filename);
+      if (fs.existsSync(localFilePath)) {
+        const extension = path.extname(localFilePath).toLowerCase();
+        res.writeHead(200, {
+          "content-type": mimeTypes[extension] || "application/octet-stream",
+          "cache-control": "public, max-age=31536000, immutable",
+        });
+        fs.createReadStream(localFilePath).pipe(res);
+        return;
+      }
+
+      sendText(res, 404, "Upload not found");
+      return;
+    }
+
     const filePath = safeFilePath(requestedPath);
     if (!filePath || !fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
       sendText(res, 404, "Not found");
