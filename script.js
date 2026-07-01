@@ -698,6 +698,13 @@ function applySiteContent() {
   const cartBadgeLabel = document.getElementById("cartBadgeLabel");
   if (cartBadgeLabel) cartBadgeLabel.textContent = currentLang === "ar" ? "الطلبات" : "Orders";
 
+  const branchSelectLabel = document.getElementById("branchSelectLabel");
+  if (branchSelectLabel) {
+    branchSelectLabel.textContent = currentLang === "ar" ? "اختر فرع الاستلام / الطلب:" : "Select Pickup Branch:";
+  }
+  const branchContainer = document.getElementById("cartBranchButtons");
+  if (branchContainer) branchContainer.innerHTML = ""; // Clear so it regenerates in correct language
+
   if (typeof updateCartUI === "function") updateCartUI();
 
   // Switch button visual toggle
@@ -1071,6 +1078,7 @@ window.addEventListener("load", () => {
 
 /* ─── Shopping Cart Logic ─── */
 let cart = {};
+let selectedBranch = "";
 
 window.addToCart = function (name, priceString, image) {
   // Extract number from price (e.g., "6.50 JOD" -> 6.5)
@@ -1122,10 +1130,19 @@ window.sendOrderToWhatsApp = function () {
   if (items.length === 0) return;
 
   const isAr = currentLang === "ar";
+
+  if (!selectedBranch) {
+    alert(isAr ? "الرجاء اختيار فرع الاستلام قبل إرسال الطلب!" : "Please select the pickup branch before sending the order!");
+    return;
+  }
   
   let msg = isAr 
     ? `*🇯🇴 طلب جديد من غماس بلدي 🇯🇴*\n`
     : `*🇯🇴 New Order from Ghmaas Baladi 🇯🇴*\n`;
+
+  msg += isAr
+    ? `*الفرع المختص:* ${selectedBranch}\n`
+    : `*Selected Branch:* ${selectedBranch}\n`;
     
   msg += `-------------------------------------\n`;
   
@@ -1250,5 +1267,55 @@ function updateCartUI() {
     }
   }
   
+  // 6. Render branch selector buttons
+  const branchContainer = document.getElementById("cartBranchButtons");
+  if (branchContainer) {
+    if (items.length === 0) {
+      const selectorWrapper = document.querySelector(".cart-branch-selector");
+      if (selectorWrapper) selectorWrapper.style.display = "none";
+      selectedBranch = ""; // Reset selection if cart is empty
+    } else {
+      const selectorWrapper = document.querySelector(".cart-branch-selector");
+      if (selectorWrapper) selectorWrapper.style.display = "block";
+      
+      if (branchContainer.children.length === 0 && site && Array.isArray(site.branches)) {
+        branchContainer.innerHTML = "";
+        site.branches.forEach((branch) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "cart-branch-btn";
+          btn.dataset.branch = branch.title;
+          
+          const title = isAr ? branch.title : (branch.title === "شارع المدينة المنورة" ? "Al-Madinah Al-Munawwarah St." : (branch.title === "شارع مكة" ? "Mecca St." : "Tabarbour"));
+          
+          btn.innerHTML = `
+            <i data-lucide="map-pin"></i>
+            <span>${title}</span>
+          `;
+          
+          btn.addEventListener("click", () => {
+            document.querySelectorAll(".cart-branch-btn").forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectedBranch = branch.title;
+          });
+          
+          if (selectedBranch === branch.title) {
+            btn.classList.add("active");
+          }
+          
+          branchContainer.appendChild(btn);
+        });
+      } else {
+        document.querySelectorAll(".cart-branch-btn").forEach((btn) => {
+          if (btn.dataset.branch === selectedBranch) {
+            btn.classList.add("active");
+          } else {
+            btn.classList.remove("active");
+          }
+        });
+      }
+    }
+  }
+
   if (window.lucide) window.lucide.createIcons();
 }

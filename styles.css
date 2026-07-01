@@ -3825,3 +3825,47 @@ html[dir="rtl"] .admin-layout {
     padding: 20px !important;
   }
 }
+
+/* Classy Cart Branch Buttons */
+.cart-branch-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(212, 168, 83, 0.15);
+  border-radius: var(--radius-md);
+  color: var(--cream-soft);
+  padding: 12px 16px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: all var(--transition-fast);
+  text-align: right;
+  outline: none;
+}
+
+.cart-branch-btn svg {
+  width: 16px;
+  height: 16px;
+  color: var(--gold);
+  transition: color var(--transition-fast);
+}
+
+.cart-branch-btn:hover {
+  background: rgba(212, 168, 83, 0.06);
+  color: #fff;
+  border-color: rgba(212, 168, 83, 0.35);
+}
+
+.cart-branch-btn.active {
+  background: rgba(196, 18, 41, 0.12) !important;
+  border-color: rgba(196, 18, 41, 0.4) !important;
+  color: #ff8e9b !important;
+  box-shadow: 0 0 15px rgba(196, 18, 41, 0.1);
+}
+
+.cart-branch-btn.active svg {
+  color: var(--red) !important;
+}
