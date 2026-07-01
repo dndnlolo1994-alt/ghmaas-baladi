@@ -3199,3 +3199,16 @@ html[dir="rtl"] .admin-layout {
   to { transform: rotate(360deg); }
 }
 
+.uploader-path-label {
+  font-size: 0.72rem;
+  color: var(--cream-soft);
+  opacity: 0.6;
+  margin-top: 4px;
+  direction: ltr;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 4px;
+}
+

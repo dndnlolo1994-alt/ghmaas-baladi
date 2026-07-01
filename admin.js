@@ -71,10 +71,13 @@ function makeField(label, value, onInput, type = "input") {
     const previewContainer = document.createElement("div");
     previewContainer.className = "uploader-preview";
 
+    const pathLabel = document.createElement("div");
+    pathLabel.className = "uploader-path-label";
+
     function updatePreview(url) {
       previewContainer.innerHTML = "";
+      pathLabel.textContent = url ? `مسار الصورة: ${url}` : "لا يوجد صورة مرفوعة";
       if (url && url.trim() !== "") {
-        // If it starts with ./ or is a relative path, prefix with current domain
         const img = document.createElement("img");
         img.src = url;
         img.alt = label;
@@ -134,6 +137,7 @@ function makeField(label, value, onInput, type = "input") {
     uploaderCard.appendChild(fileInput);
     uploaderCard.appendChild(previewContainer);
     wrapper.appendChild(uploaderCard);
+    wrapper.appendChild(pathLabel);
 
     return wrapper;
   }
