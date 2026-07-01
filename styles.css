@@ -1429,14 +1429,15 @@ input {
   justify-content: space-between;
   gap: 28px;
   margin-top: 36px;
-  padding: 32px;
+  padding: 36px;
   border-radius: var(--radius-xl);
   color: var(--cream);
-  background:
-    linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(212, 168, 83, 0.06)),
-    url("https://amenomenu.com/images/products_images/1848998469628441.webp") center/cover;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-card);
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(196, 18, 41, 0.08), transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(212, 168, 83, 0.06), transparent 45%),
+    linear-gradient(135deg, rgba(15, 15, 15, 0.9), rgba(10, 10, 10, 0.98));
+  border: 1px solid rgba(212, 168, 83, 0.25);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   position: relative;
   overflow: hidden;
 }
@@ -1465,6 +1466,86 @@ input {
 .contact-band p {
   margin: 0;
   color: var(--cream-soft);
+}
+
+.contact-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Redesigned glowing icons & buttons for communication */
+.contact-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-size: 0.95rem;
+  transition: all var(--transition-normal);
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Phone Button (Gold filled with rich glow) */
+.contact-actions a.primary-btn {
+  background: var(--gold-gradient) !important;
+  color: #0c0c0c !important;
+  border: 1px solid var(--gold) !important;
+  box-shadow: 0 8px 25px rgba(212, 168, 83, 0.25) !important;
+}
+
+.contact-actions a.primary-btn:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 12px 30px rgba(212, 168, 83, 0.45) !important;
+}
+
+/* Instagram Button */
+.contact-actions a[href*="instagram"] {
+  background: rgba(255, 255, 255, 0.02) !important;
+  color: var(--cream) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(8px);
+}
+
+.contact-actions a[href*="instagram"]:hover {
+  background: rgba(225, 48, 108, 0.1) !important;
+  border-color: #e1306c !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 25px rgba(225, 48, 108, 0.25) !important;
+  transform: translateY(-3px) !important;
+}
+
+/* Facebook Button */
+.contact-actions a[href*="facebook"] {
+  background: rgba(255, 255, 255, 0.02) !important;
+  color: var(--cream) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(8px);
+}
+
+.contact-actions a[href*="facebook"]:hover {
+  background: rgba(24, 119, 242, 0.1) !important;
+  border-color: #1877f2 !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 25px rgba(24, 119, 242, 0.25) !important;
+  transform: translateY(-3px) !important;
+}
+
+.contact-actions a svg {
+  width: 18px;
+  height: 18px;
+  color: inherit !important;
+  filter: none !important;
+  transition: transform var(--transition-normal);
+}
+
+.contact-actions a:hover svg {
+  transform: scale(1.15) rotate(-3deg);
 }
 
 /* ══════════════════════════════════════════════════════════
