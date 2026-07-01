@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>لوحة أدمن غماس بلدي</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Reem+Kufi:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <script src="./admin.js" defer></script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="admin-body">
+    <main class="admin-shell">
+      <section class="login-card" id="loginCard">
+        <span>غماس بلدي</span>
+        <h1>لوحة الأدمن</h1>
+        <p>ادخل كلمة المرور لتعديل الأسعار، الأصناف، الصور، الفروع، ونصوص الصفحة.</p>
+        <form id="loginForm">
+          <label>
+            كلمة المرور
+            <input type="password" id="passwordInput" autocomplete="current-password" placeholder="admin123" />
+          </label>
+          <button class="admin-primary" type="submit">
+            <i data-lucide="log-in"></i>
+            دخول
+          </button>
+        </form>
+        <small id="loginMessage"></small>
+      </section>
+
+      <section class="admin-app" id="adminApp" hidden>
+        <header class="admin-topbar">
+          <div>
+            <span>لوحة التحكم</span>
+            <h1>غماس بلدي</h1>
+          </div>
+          <div class="admin-actions">
+            <a class="admin-secondary" href="/" target="_blank" rel="noreferrer">
+              <i data-lucide="external-link"></i>
+              عرض الموقع
+            </a>
+            <button class="admin-secondary" type="button" id="logoutButton">
+              <i data-lucide="log-out"></i>
+              خروج
+            </button>
+            <button class="admin-primary" type="button" id="saveButton">
+              <i data-lucide="save"></i>
+              حفظ كل التعديلات
+            </button>
+          </div>
+        </header>
+
+        <p class="admin-status" id="adminStatus">جاهز للتعديل.</p>
+
+        <section class="admin-panel">
+          <div class="admin-panel-heading">
+            <i data-lucide="settings"></i>
+            <div>
+              <h2>بيانات الموقع</h2>
+              <p>الاسم، التواصل، الإهداء، وصور الهيرو.</p>
+            </div>
+          </div>
+          <div class="admin-grid two" id="siteFields"></div>
+        </section>
+
+        <section class="admin-panel">
+          <div class="admin-panel-heading">
+            <i data-lucide="map-pin"></i>
+            <div>
+              <h2>الفروع</h2>
+              <p>أضف أو عدل عناوين الفروع وروابط الخرائط.</p>
+            </div>
+          </div>
+          <div class="admin-list" id="branchesEditor"></div>
+          <button class="admin-secondary inline" type="button" id="addBranchButton">
+            <i data-lucide="plus"></i>
+            إضافة فرع
+          </button>
+        </section>
+
+        <section class="admin-panel">
+          <div class="admin-panel-heading">
+            <i data-lucide="utensils"></i>
+            <div>
+              <h2>المنيو والأسعار</h2>
+              <p>كل صنف قابل للتعديل: الاسم، الوصف، السعر، والصورة.</p>
+            </div>
+          </div>
+          <div class="admin-list" id="menuEditor"></div>
+          <button class="admin-secondary inline" type="button" id="addCategoryButton">
+            <i data-lucide="plus"></i>
+            إضافة قسم
+          </button>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
