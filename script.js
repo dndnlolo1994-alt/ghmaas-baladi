@@ -483,6 +483,30 @@ function applySiteContent() {
   updateHref('a[href*="instagram.com"]', site.instagram || "#");
   updateHref('a[href*="facebook.com"]', site.facebook || "#");
 
+  // Translate Contact Band details
+  const contactEyebrow = document.querySelector(".contact-band .eyebrow-badge");
+  if (contactEyebrow) contactEyebrow.textContent = currentLang === "ar" ? "جاهز تطلب؟" : "Ready to order?";
+
+  const contactTitle = document.querySelector(".contact-band h2");
+  if (contactTitle) contactTitle.textContent = currentLang === "ar" ? "اتصل أو ابعث واتساب" : "Call or Send WhatsApp";
+
+  const contactDesc = document.querySelector(".contact-band p");
+  if (contactDesc) {
+    contactDesc.textContent = currentLang === "ar"
+      ? "الطلب والتفاصيل عبر الرقم الرسمي الظاهر في صفحة المطعم."
+      : "Order and details via the official number shown on the restaurant page.";
+  }
+
+  // Translate Social button labels in Contact Band
+  const whatsappButtonText = document.querySelector(".contact-actions a[href*='wa.me'] .btn-text");
+  if (whatsappButtonText) whatsappButtonText.textContent = currentLang === "ar" ? "واتساب" : "WhatsApp";
+
+  const instagramButtonText = document.querySelector(".contact-actions a[href*='instagram'] .btn-text");
+  if (instagramButtonText) instagramButtonText.textContent = currentLang === "ar" ? "إنستغرام" : "Instagram";
+
+  const facebookButtonText = document.querySelector(".contact-actions a[href*='facebook'] .btn-text");
+  if (facebookButtonText) facebookButtonText.textContent = currentLang === "ar" ? "فيسبوك" : "Facebook";
+
   // Phone Call Action Button
   const phoneButton = document.querySelector(".contact-actions .primary-btn");
   if (phoneButton) {
