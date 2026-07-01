@@ -585,8 +585,6 @@ function applySiteContent() {
     }
   }
 
-  // Dedication Line
-  updateText(".dedication", currentLang === "ar" ? site.dedication : t.dedication);
 
   // Switch button visual toggle
   const langBtn = document.getElementById("langSwitcher");
