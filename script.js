@@ -356,7 +356,6 @@ function renderTabs() {
     button.className = "category-tab";
     button.dataset.category = category.id;
     button.innerHTML = `
-      ${category.image ? `<img src="${category.image}" alt="" loading="lazy" />` : ""}
       <span>${category.title}</span>
       <small>${(category.items || []).length}</small>
     `;
@@ -418,7 +417,6 @@ function renderMenu() {
           <span>${category.items.length} صنف</span>
           <h3>${category.title}</h3>
         </div>
-        ${category.image ? `<img src="${category.image}" alt="" loading="lazy" />` : ""}
       </div>
     `;
 
