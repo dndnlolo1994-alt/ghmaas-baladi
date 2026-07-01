@@ -2,6 +2,7 @@ const loginCard = document.querySelector("#loginCard");
 const adminApp = document.querySelector("#adminApp");
 const loginForm = document.querySelector("#loginForm");
 const loginMessage = document.querySelector("#loginMessage");
+const emailInput = document.querySelector("#emailInput");
 const passwordInput = document.querySelector("#passwordInput");
 const statusBox = document.querySelector("#adminStatus");
 const siteFields = document.querySelector("#siteFields");
@@ -293,7 +294,10 @@ loginForm.addEventListener("submit", async (event) => {
   try {
     await api("/api/login", {
       method: "POST",
-      body: JSON.stringify({ password: passwordInput.value }),
+      body: JSON.stringify({
+        email: emailInput.value,
+        password: passwordInput.value
+      }),
     });
     loginMessage.textContent = "";
     await loadAdmin();

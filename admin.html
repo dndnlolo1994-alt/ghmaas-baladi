@@ -19,11 +19,15 @@
       <section class="login-card" id="loginCard">
         <span>غماس بلدي</span>
         <h1>لوحة الأدمن</h1>
-        <p>ادخل كلمة المرور لتعديل الأسعار، الأصناف، الصور، الفروع، ونصوص الصفحة.</p>
+        <p>ادخل البريد الإلكتروني وكلمة المرور لتعديل الأسعار، الأصناف، الصور، الفروع، ونصوص الصفحة.</p>
         <form id="loginForm">
           <label>
+            البريد الإلكتروني
+            <input type="email" id="emailInput" autocomplete="username" placeholder="contact@ghmass-baladi.com" required />
+          </label>
+          <label>
             كلمة المرور
-            <input type="password" id="passwordInput" autocomplete="current-password" placeholder="admin123" />
+            <input type="password" id="passwordInput" autocomplete="current-password" placeholder="••••••••" required />
           </label>
           <button class="admin-primary" type="submit">
             <i data-lucide="log-in"></i>

@@ -9,7 +9,8 @@ const root = __dirname;
 const dataDir = path.join(root, "data");
 const dataFile = path.join(dataDir, "site.json");
 const port = Number(process.env.PORT || 5174);
-const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+const adminEmail = process.env.ADMIN_EMAIL || "contact@ghmass-baladi.com";
+const adminPassword = process.env.ADMIN_PASSWORD || "Ghmass2026$";
 const sessions = new Set();
 
 // Supabase PostgreSQL Connection Pool
@@ -241,8 +242,8 @@ async function handleApi(req, res, pathname) {
 
   if (req.method === "POST" && pathname === "/api/login") {
     const body = await readBody(req);
-    if (body.password !== adminPassword) {
-      sendJson(res, 401, { error: "كلمة المرور غير صحيحة" });
+    if (body.email !== adminEmail || body.password !== adminPassword) {
+      sendJson(res, 401, { error: "البريد الإلكتروني أو كلمة المرور غير صحيحة" });
       return true;
     }
     const token = crypto.randomBytes(32).toString("hex");
