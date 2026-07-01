@@ -305,19 +305,27 @@ async function handleApi(req, res, pathname) {
         return true;
       } catch (error) {
         console.error("Failed to upload image to database:", error);
+        sendJson(res, 500, { error: `فشل الرفع لقاعدة البيانات: ${error.message}` });
+        return true;
       }
     }
 
-    // Fallback: local disk storage
-    const uploadsDir = path.join(root, "uploads");
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-    const targetPath = path.join(uploadsDir, uniqueFilename);
-    fs.writeFileSync(targetPath, buffer);
+    try {
+      // Fallback: local disk storage
+      const uploadsDir = path.join(root, "uploads");
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      const targetPath = path.join(uploadsDir, uniqueFilename);
+      fs.writeFileSync(targetPath, buffer);
 
-    sendJson(res, 200, { url: `/uploads/${uniqueFilename}` });
-    return true;
+      sendJson(res, 200, { url: `/uploads/${uniqueFilename}` });
+      return true;
+    } catch (error) {
+      console.error("Failed local fallback write:", error);
+      sendJson(res, 500, { error: `فشل حفظ الملف محلياً: ${error.message}` });
+      return true;
+    }
   }
 
   return false;
