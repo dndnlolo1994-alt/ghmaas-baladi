@@ -48,6 +48,97 @@ async function api(path, options = {}) {
 }
 
 function makeField(label, value, onInput, type = "input") {
+  // Check if this is an image field
+  const isImageField = label.includes("صورة") || label.includes("الشعار") || label.includes("لوجو") || label.includes("heroImages");
+
+  if (isImageField) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "admin-field image-field-wrapper";
+
+    const labelSpan = document.createElement("span");
+    labelSpan.className = "field-label";
+    labelSpan.textContent = label;
+    wrapper.appendChild(labelSpan);
+
+    const uploaderCard = document.createElement("div");
+    uploaderCard.className = "image-uploader-card";
+
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.style.display = "none";
+
+    const previewContainer = document.createElement("div");
+    previewContainer.className = "uploader-preview";
+
+    function updatePreview(url) {
+      previewContainer.innerHTML = "";
+      if (url && url.trim() !== "") {
+        // If it starts with ./ or is a relative path, prefix with current domain
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = label;
+        previewContainer.appendChild(img);
+
+        const overlay = document.createElement("div");
+        overlay.className = "uploader-overlay";
+        overlay.innerHTML = `<i data-lucide="camera"></i><span>تغيير الصورة</span>`;
+        previewContainer.appendChild(overlay);
+      } else {
+        const placeholder = document.createElement("div");
+        placeholder.className = "uploader-placeholder";
+        placeholder.innerHTML = `<i data-lucide="image-plus"></i><span>اضغط أو انقر لرفع صورة</span>`;
+        previewContainer.appendChild(placeholder);
+      }
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    updatePreview(value);
+
+    // Trigger file click when card is tapped/clicked
+    uploaderCard.addEventListener("click", (e) => {
+      e.preventDefault();
+      fileInput.click();
+    });
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      try {
+        previewContainer.innerHTML = `
+          <div class="uploader-loading">
+            <div class="spinner"></div>
+            <span>جاري الرفع...</span>
+          </div>
+        `;
+        if (window.lucide) window.lucide.createIcons();
+        
+        const url = `/api/upload?filename=${encodeURIComponent(file.name)}`;
+        const response = await fetch(url, {
+          method: "POST",
+          body: file,
+        });
+
+        if (!response.ok) throw new Error("فشل رفع الملف");
+        const data = await response.json();
+
+        updatePreview(data.url);
+        onInput(data.url);
+      } catch (error) {
+        alert(error.message);
+        updatePreview(value);
+      }
+    });
+
+    uploaderCard.appendChild(fileInput);
+    uploaderCard.appendChild(previewContainer);
+    wrapper.appendChild(uploaderCard);
+
+    return wrapper;
+  }
+
+  // Standard text/textarea fields
   const wrapper = document.createElement("label");
   wrapper.className = "admin-field";
 
@@ -64,63 +155,6 @@ function makeField(label, value, onInput, type = "input") {
   const control = type === "textarea" ? document.createElement("textarea") : document.createElement("input");
   control.value = value || "";
   control.addEventListener("input", () => onInput(control.value));
-
-  // If this is an image field (contains "صورة" or "شعار" or "لوجو")
-  if (label.includes("صورة") || label.includes("الشعار") || label.includes("لوجو") || label.includes("heroImages")) {
-    const uploadBtn = document.createElement("button");
-    uploadBtn.type = "button";
-    uploadBtn.className = "admin-secondary inline";
-    uploadBtn.style.padding = "2px 8px";
-    uploadBtn.style.fontSize = "0.75rem";
-    uploadBtn.style.margin = "0";
-    uploadBtn.innerHTML = `<i data-lucide="upload" style="width: 12px; height: 12px; vertical-align: middle; margin-inline-end: 4px;"></i> رفع`;
-
-    const fileInput = document.createElement("input");
-    fileInput.type = "file";
-    fileInput.accept = "image/*";
-    fileInput.style.display = "none";
-
-    uploadBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      fileInput.click();
-    });
-
-    fileInput.addEventListener("change", async () => {
-      const file = fileInput.files[0];
-      if (!file) return;
-
-      try {
-        uploadBtn.disabled = true;
-        uploadBtn.textContent = "جاري الرفع...";
-
-        const url = `/api/upload?filename=${encodeURIComponent(file.name)}`;
-        const response = await fetch(url, {
-          method: "POST",
-          body: file, // Send binary directly
-        });
-
-        if (!response.ok) throw new Error("فشل رفع الملف");
-        const data = await response.json();
-
-        control.value = data.url;
-        onInput(data.url);
-        uploadBtn.disabled = false;
-        uploadBtn.innerHTML = `<i data-lucide="check" style="width: 12px; height: 12px; color: #10b981; vertical-align: middle; margin-inline-end: 4px;"></i> تم`;
-        setTimeout(() => {
-          uploadBtn.innerHTML = `<i data-lucide="upload" style="width: 12px; height: 12px; vertical-align: middle; margin-inline-end: 4px;"></i> رفع`;
-          if (window.lucide) window.lucide.createIcons();
-        }, 2000);
-      } catch (error) {
-        alert(error.message);
-        uploadBtn.disabled = false;
-        uploadBtn.innerHTML = `<i data-lucide="upload" style="width: 12px; height: 12px; vertical-align: middle; margin-inline-end: 4px;"></i> رفع`;
-      }
-      if (window.lucide) window.lucide.createIcons();
-    });
-
-    headerDiv.appendChild(uploadBtn);
-    headerDiv.appendChild(fileInput);
-  }
 
   wrapper.appendChild(headerDiv);
   wrapper.appendChild(control);
