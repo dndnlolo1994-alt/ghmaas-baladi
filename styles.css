@@ -3697,7 +3697,8 @@ html[dir="rtl"] .admin-layout {
   }
 
   .nav-tab {
-    flex: 0 0 auto;
+    flex: 1 0 auto;
+    width: max-content !important;
   }
 
   .admin-summary-strip {
