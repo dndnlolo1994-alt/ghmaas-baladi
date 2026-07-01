@@ -11,7 +11,11 @@
           "styles.css",
           "script.js",
           "menu-data.js",
-          "data/site.json"
+          "data/site.json",
+          "logo.png",
+          "branch_madina.png",
+          "branch_mecca.png",
+          "branch_tabarbour.png"
         ]
       }
     }
