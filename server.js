@@ -14,7 +14,7 @@ const adminPassword = process.env.ADMIN_PASSWORD || "Ghmass2026$";
 const sessions = new Set();
 
 // Supabase PostgreSQL Connection Pool
-const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:CI8FYeO8Lxa2cF9H@db.ijyidjhsixumlomobjpt.supabase.co:5432/postgres";
+const dbUrl = process.env.DATABASE_URL || "postgresql://postgres.ijyidjhsixumlomobjpt:CI8FYeO8Lxa2cF9H@aws-0-eu-central-1.pooler.supabase.com:6543/postgres";
 let pool;
 try {
   pool = new Pool({
