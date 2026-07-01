@@ -329,6 +329,38 @@ input {
   letter-spacing: 0.03em;
 }
 
+/* Jordanian Shemagh Badge (الشماغ المهدب) */
+.shemagh-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #ffffff !important;
+  padding: 1px 6px 2px;
+  margin-inline-start: 6px;
+  border-radius: 4px;
+  background: repeating-linear-gradient(45deg, #c41229, #c41229 3px, #ffffff 3px, #ffffff 6px);
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 0 10px rgba(196, 18, 41, 0.4);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  position: relative;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.shemagh-tag::after {
+  content: "";
+  position: absolute;
+  bottom: -4.5px;
+  left: 3px;
+  right: 3px;
+  height: 4px;
+  background-image: radial-gradient(circle, #ffffff 1.2px, transparent 1.2px);
+  background-size: 4px 4px;
+  background-repeat: repeat-x;
+}
+
 /* Desktop Nav */
 .desktop-nav {
   display: flex;

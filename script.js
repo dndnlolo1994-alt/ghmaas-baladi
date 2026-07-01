@@ -446,6 +446,9 @@ function applySiteContent() {
   // Brand identity
   updateText(".brand-lockup strong, .footer-brand strong", currentLang === "ar" ? site.brandName : t.brandName);
   updateText(".brand-lockup small", currentLang === "ar" ? site.tagline : t.tagline);
+  document.querySelectorAll(".shemagh-tag").forEach((tag) => {
+    tag.textContent = currentLang === "ar" ? "مهدّب 🇯🇴" : "Shemagh 🇯🇴";
+  });
   updateText(".hero h1", currentLang === "ar" ? site.brandName : t.brandName);
   updateText(".hero-content p", currentLang === "ar" ? site.heroDescription : t.heroDescription);
   updateText(".site-footer small", currentLang === "ar" ? site.sourceNote : t.sourceNote);
