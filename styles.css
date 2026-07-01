@@ -329,37 +329,36 @@ input {
   letter-spacing: 0.03em;
 }
 
-/* Jordanian Shemagh Badge (الشماغ المهدب) */
-.shemagh-tag {
+/* Jordanian Shemagh Badge (الشماغ المهدب الأصيل) */
+.shemagh-badge {
   display: inline-flex;
   align-items: center;
-  font-size: 0.68rem;
-  font-weight: 800;
-  color: #ffffff !important;
-  padding: 2px 7px 3px;
-  margin-inline-start: 6px;
-  border-radius: 4px;
-  background: url("./shemagh_pattern.png") repeat;
-  background-size: 45px auto;
-  border: 1.5px solid #ffffff;
-  box-shadow: 0 0 10px rgba(196, 18, 41, 0.45);
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
-  position: relative;
-  letter-spacing: 0.05em;
+  gap: 6px;
+  background: rgba(196, 18, 41, 0.14);
+  border: 1px solid rgba(212, 168, 83, 0.35);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 15px rgba(196, 18, 41, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.1);
   vertical-align: middle;
-  line-height: 1;
+  margin-inline-start: 8px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-.shemagh-tag::after {
-  content: "";
-  position: absolute;
-  bottom: -4.5px;
-  left: 3px;
-  right: 3px;
-  height: 4px;
-  background-image: radial-gradient(circle, #ffffff 1.2px, transparent 1.2px);
-  background-size: 4px 4px;
-  background-repeat: repeat-x;
+.shemagh-icon-img {
+  width: 22px;
+  height: auto;
+  max-height: 18px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+}
+
+.shemagh-text {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--cream);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+  line-height: 1;
 }
 
 /* Desktop Nav */
