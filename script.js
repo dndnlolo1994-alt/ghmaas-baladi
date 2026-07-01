@@ -602,16 +602,49 @@ function applySiteContent() {
   // Contact Band
   const contactBand = document.querySelector(".contact-band");
   if (contactBand) {
-    contactBand.querySelector("span").textContent = t.orderReady;
-    contactBand.querySelector("h2").textContent = t.contactAction;
-    contactBand.querySelector("p").textContent = t.contactNote;
-    const socBtns = contactBand.querySelectorAll(".secondary-btn");
-    if (socBtns.length >= 2) {
-      socBtns[0].innerHTML = `<i data-lucide="instagram"></i>${t.instagram}`;
-      socBtns[1].innerHTML = `<i data-lucide="facebook"></i>${t.facebook}`;
+    const contactEyebrow = contactBand.querySelector(".eyebrow-badge");
+    if (contactEyebrow) contactEyebrow.textContent = currentLang === "ar" ? "جاهز تطلب؟" : "Ready to order?";
+    
+    const contactTitle = contactBand.querySelector("h2");
+    if (contactTitle) contactTitle.textContent = currentLang === "ar" ? "اتصل أو ابعث واتساب" : "Call or Send WhatsApp";
+    
+    const contactDesc = contactBand.querySelector("p");
+    if (contactDesc) {
+      contactDesc.textContent = currentLang === "ar"
+        ? "الطلب والتفاصيل عبر الرقم الرسمي الظاهر في صفحة المطعم."
+        : "Order and details via the official number shown on the restaurant page.";
     }
+
+    const whatsappBtnText = contactBand.querySelector(".whatsapp-btn .btn-text");
+    if (whatsappBtnText) whatsappBtnText.textContent = currentLang === "ar" ? "واتساب" : "WhatsApp";
+
+    const instagramBtnText = contactBand.querySelector(".instagram-btn .btn-text");
+    if (instagramBtnText) instagramBtnText.textContent = currentLang === "ar" ? "إنستغرام" : "Instagram";
+
+    const facebookBtnText = contactBand.querySelector(".facebook-btn .btn-text");
+    if (facebookBtnText) facebookBtnText.textContent = currentLang === "ar" ? "فيسبوك" : "Facebook";
   }
 
+  // Translate shopping cart labels
+  const cartTitleLabel = document.getElementById("cartTitleLabel");
+  if (cartTitleLabel) cartTitleLabel.textContent = currentLang === "ar" ? "سلة طلباتك" : "Your Cart";
+
+  const cartSubtotalLabel = document.getElementById("cartSubtotalLabel");
+  if (cartSubtotalLabel) cartSubtotalLabel.textContent = currentLang === "ar" ? "المجموع الفرعي:" : "Subtotal:";
+
+  const cartTaxLabel = document.getElementById("cartTaxLabel");
+  if (cartTaxLabel) cartTaxLabel.textContent = currentLang === "ar" ? "الضريبة (8%):" : "Tax (8%):";
+
+  const cartTotalLabel = document.getElementById("cartTotalLabel");
+  if (cartTotalLabel) cartTotalLabel.textContent = currentLang === "ar" ? "المجموع الكلي:" : "Total Amount:";
+
+  const sendOrderBtnLabel = document.getElementById("sendOrderBtnLabel");
+  if (sendOrderBtnLabel) sendOrderBtnLabel.textContent = currentLang === "ar" ? "إرسال الطلب عبر الواتساب" : "Send Order to WhatsApp";
+
+  const cartBadgeLabel = document.getElementById("cartBadgeLabel");
+  if (cartBadgeLabel) cartBadgeLabel.textContent = currentLang === "ar" ? "الطلبات" : "Orders";
+
+  if (typeof updateCartUI === "function") updateCartUI();
 
   // Switch button visual toggle
   const langBtn = document.getElementById("langSwitcher");
@@ -749,8 +782,6 @@ function createDishCard(item, categoryTitle) {
   } else if (!dishDesc) {
     dishDesc = "طبق من قائمة غماس بلدي.";
   }
-
-  const message = encodeURIComponent(currentLang === "ar" ? `مرحبا، بدي اسأل عن ${item.name}` : `Hello, I'd like to ask about ${dishName}`);
   
   article.innerHTML = `
     <div class="dish-image">
@@ -762,9 +793,16 @@ function createDishCard(item, categoryTitle) {
       <p>${dishDesc}</p>
       <div class="dish-footer">
         <strong>${item.price}</strong>
-        <a href="https://wa.me/${site.whatsapp || ""}?text=${message}" target="_blank" rel="noreferrer" aria-label="WhatsApp about ${dishName}">
-          <i data-lucide="message-circle"></i>
-        </a>
+        <div class="cart-control" data-item-name="${item.name.replace(/'/g, "\\'")}">
+          <button class="add-btn" onclick="window.addToCart('${item.name.replace(/'/g, "\\'")}', '${item.price}', '${item.image}')">
+            <span>${currentLang === 'ar' ? 'إضافة +' : 'Add +'}</span>
+          </button>
+          <div class="qty-adjust" style="display: none;">
+            <button class="minus-btn" onclick="window.updateQty('${item.name.replace(/'/g, "\\'")}', -1)">-</button>
+            <span class="qty-val">0</span>
+            <button class="plus-btn" onclick="window.updateQty('${item.name.replace(/'/g, "\\'")}', 1)">+</button>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -808,6 +846,7 @@ function renderMenu() {
   emptyState.hidden = visible.length > 0;
   if (window.lucide) window.lucide.createIcons();
   watchRevealElements(grid);
+  if (typeof updateCartUI === "function") updateCartUI();
 }
 
 /* ─── Category Selection ─── */
@@ -965,3 +1004,187 @@ loadSite();
 window.addEventListener("load", () => {
   if (window.lucide) window.lucide.createIcons();
 });
+
+/* ─── Shopping Cart Logic ─── */
+let cart = {};
+
+window.addToCart = function (name, priceString, image) {
+  // Extract number from price (e.g., "6.50 JOD" -> 6.5)
+  const priceFloat = parseFloat(priceString.replace(/[^\d.]/g, "")) || 0;
+  cart[name] = {
+    name,
+    priceString,
+    priceFloat,
+    image,
+    qty: 1
+  };
+  updateCartUI();
+  
+  // Show pop animation for the cart badge
+  const floatingCart = document.getElementById("floatingCart");
+  if (floatingCart) {
+    floatingCart.classList.add("cart-pop");
+    setTimeout(() => floatingCart.classList.remove("cart-pop"), 400);
+  }
+};
+
+window.updateQty = function (name, delta) {
+  if (!cart[name]) return;
+  cart[name].qty += delta;
+  if (cart[name].qty <= 0) {
+    delete cart[name];
+  }
+  updateCartUI();
+};
+
+window.toggleCartModal = function (show) {
+  const backdrop = document.getElementById("cartBackdrop");
+  const drawer = document.getElementById("cartDrawer");
+  if (backdrop && drawer) {
+    if (show) {
+      backdrop.classList.add("visible");
+      drawer.classList.add("open");
+      document.body.style.overflow = "hidden"; // Prevent background scroll
+    } else {
+      backdrop.classList.remove("visible");
+      drawer.classList.remove("open");
+      document.body.style.overflow = "";
+    }
+  }
+};
+
+window.sendOrderToWhatsApp = function () {
+  const items = Object.values(cart);
+  if (items.length === 0) return;
+
+  const isAr = currentLang === "ar";
+  
+  let msg = isAr 
+    ? `*🇯🇴 طلب جديد من غماس بلدي 🇯🇴*\n`
+    : `*🇯🇴 New Order from Ghmaas Baladi 🇯🇴*\n`;
+    
+  msg += `-------------------------------------\n`;
+  
+  let subtotal = 0;
+  items.forEach((item) => {
+    const trans = menuTranslations[item.name] || {};
+    const itemName = isAr ? item.name : (trans.name || item.name);
+    const itemTotal = item.priceFloat * item.qty;
+    subtotal += itemTotal;
+    
+    msg += `• ${item.qty} × ${itemName} (${item.priceString})\n`;
+  });
+  
+  const tax = subtotal * 0.08;
+  const total = subtotal + tax;
+  
+  msg += `-------------------------------------\n`;
+  msg += isAr 
+    ? `*المجموع الفرعي:* ${subtotal.toFixed(2)} JOD\n`
+    : `*Subtotal:* ${subtotal.toFixed(2)} JOD\n`;
+  msg += isAr
+    ? `*الضريبة (8%):* ${tax.toFixed(2)} JOD\n`
+    : `*Tax (8%):* ${tax.toFixed(2)} JOD\n`;
+  msg += isAr
+    ? `*المجموع الكلي:* ${total.toFixed(2)} JOD\n`
+    : `*Grand Total:* ${total.toFixed(2)} JOD\n`;
+  msg += `-------------------------------------\n`;
+  msg += isAr
+    ? `بانتظار تأكيد الطلب يا غالي وشكراً لكم! 🙏`
+    : `Waiting for order confirmation, thank you! 🙏`;
+
+  const url = `https://wa.me/${site.whatsapp || "962798181200"}?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank");
+};
+
+function updateCartUI() {
+  const isAr = currentLang === "ar";
+  const items = Object.values(cart);
+  
+  // 1. Sync visible card controls
+  document.querySelectorAll(".cart-control").forEach((div) => {
+    const itemName = div.dataset.itemName;
+    const addBtn = div.querySelector(".add-btn");
+    const qtyAdjust = div.querySelector(".qty-adjust");
+    const qtyVal = div.querySelector(".qty-val");
+    
+    if (cart[itemName]) {
+      if (addBtn) addBtn.style.display = "none";
+      if (qtyAdjust) qtyAdjust.style.display = "flex";
+      if (qtyVal) qtyVal.textContent = cart[itemName].qty;
+    } else {
+      if (addBtn) addBtn.style.display = "block";
+      if (qtyAdjust) qtyAdjust.style.display = "none";
+    }
+  });
+  
+  // 2. Calculate totals
+  let totalQty = 0;
+  let subtotal = 0;
+  items.forEach((item) => {
+    totalQty += item.qty;
+    subtotal += item.priceFloat * item.qty;
+  });
+  
+  const tax = subtotal * 0.08;
+  const total = subtotal + tax;
+  
+  // 3. Update floating badge
+  const floatingCart = document.getElementById("floatingCart");
+  if (floatingCart) {
+    if (totalQty > 0) {
+      floatingCart.classList.remove("hidden");
+      const badgeCount = document.getElementById("cartBadgeCount");
+      if (badgeCount) badgeCount.textContent = totalQty;
+      const badgeTotal = document.getElementById("cartBadgeTotal");
+      if (badgeTotal) badgeTotal.textContent = `${total.toFixed(2)} JOD`;
+    } else {
+      floatingCart.classList.add("hidden");
+    }
+  }
+  
+  // 4. Update drawer summary
+  const subtotalEl = document.getElementById("cartSubtotal");
+  if (subtotalEl) subtotalEl.textContent = `${subtotal.toFixed(2)} JOD`;
+  const taxEl = document.getElementById("cartTax");
+  if (taxEl) taxEl.textContent = `${tax.toFixed(2)} JOD`;
+  const totalEl = document.getElementById("cartTotal");
+  if (totalEl) totalEl.textContent = `${total.toFixed(2)} JOD`;
+  
+  // 5. Render drawer items
+  const drawerItems = document.getElementById("cartDrawerItems");
+  if (drawerItems) {
+    if (items.length === 0) {
+      drawerItems.innerHTML = `
+        <div class="cart-empty-state">
+          <i data-lucide="shopping-bag" style="width: 48px; height: 48px; opacity: 0.3; margin-bottom: 12px;"></i>
+          <p>${isAr ? "سلة طلباتك فارغة حالياً" : "Your cart is currently empty"}</p>
+        </div>
+      `;
+    } else {
+      drawerItems.innerHTML = items.map((item) => {
+        const trans = menuTranslations[item.name] || {};
+        const itemName = isAr ? item.name : (trans.name || item.name);
+        return `
+          <div class="cart-item">
+            <img src="${item.image}" alt="${itemName}" />
+            <div class="cart-item-info">
+              <h4>${itemName}</h4>
+              <span>${item.priceString}</span>
+            </div>
+            <div class="cart-item-qty">
+              <button onclick="window.updateQty('${item.name.replace(/'/g, "\\'")}', -1)">-</button>
+              <span>${item.qty}</span>
+              <button onclick="window.updateQty('${item.name.replace(/'/g, "\\'")}', 1)">+</button>
+            </div>
+            <div class="cart-item-total">
+              <strong>${(item.priceFloat * item.qty).toFixed(2)} JOD</strong>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+  }
+  
+  if (window.lucide) window.lucide.createIcons();
+}
